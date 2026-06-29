@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import { Check, BookOpen, ChevronDown, CircleDashed, Zap } from 'lucide-react';
+import { Check, BookOpen, ChevronDown, CircleDashed, Sparkles, Zap } from 'lucide-react';
 import type { ItemStatus, Topic } from '../../types';
 import { useProgressStore } from '../../store/useProgressStore';
 
@@ -93,6 +93,18 @@ export default function TopicChecklist({ topics }: { topics: Topic[] }) {
                       {topic.explanation}
                     </ReactMarkdown>
                   </div>
+                  {topic.notes && (
+                    <div className="border-t border-white/5 px-3.5 py-3 light:border-slate-200">
+                      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-purple-300 light:text-purple-700">
+                        <Sparkles className="h-3 w-3" /> Interview deep dive
+                      </div>
+                      <div className="markdown-body text-sm text-slate-300 light:text-slate-700 [&_strong]:text-purple-300 light:[&_strong]:text-purple-700">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                          {topic.notes}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

@@ -4,6 +4,7 @@ export interface Topic {
   id: string;
   label: string;
   explanation: string;
+  notes: string;
 }
 
 export interface Question {
