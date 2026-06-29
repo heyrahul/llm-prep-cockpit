@@ -10,7 +10,7 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 
 # TRACK A — AI (build-driven)
 
-## Module 0 — Python (the primary language) — Week 1–3
+## Module 0 — Python (the primary language) — Week 1–5
 
 ### 0a — Python core, the Java→Python delta (Week 1)
 **TOPICS:** data types & mutability (list, tuple, set, dict, str, bytes); variables & references; comprehensions (list/dict/set/generator); slicing; `*args`/`**kwargs`; default args + the mutable-default trap; functions as first-class objects; closures & late binding; decorators; generators, iterators, `yield`, lazy evaluation; context managers & `with`; exceptions & custom exceptions; `enumerate`/`zip`/`map`/`filter`; f-strings; `dataclasses`; modules, packages, imports; `pip` + virtualenv/`uv`/`poetry`; duck typing; EAFP vs LBYL; truthiness; `is` vs `==`; shallow vs deep copy; name mangling (`_`/`__`).
@@ -30,9 +30,16 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 **UNLOCKS:** FastAPI vs Flask vs Django; enforce structured output + handle malformed JSON; request/response validation & error handling; token streaming to a client.
 **DRILL:** Stand up a streaming, validated LLM endpoint; explain each layer (router → Pydantic → async client → stream).
 
+### 0d — AI/ML foundations & PyTorch (Week 4–5)
+*For anyone arriving from a non-ML background (e.g. a Java/backend career) — the bridge between "I can write FastAPI services" and Module 1's transformer internals, which otherwise assumes ML vocabulary (gradients, softmax, loss) you won't yet have.*
+**TOPICS:** what ML is (supervised/unsupervised/RL, self-supervised pretraining, RLHF); features/labels, regression vs classification; linear regression; logistic regression, sigmoid, softmax; loss functions (MSE vs cross-entropy, perplexity); gradient descent (batch/SGD/mini-batch, learning rate); backpropagation & the chain rule; neurons, weights, bias, activation functions (sigmoid/tanh/ReLU/GELU) & why nonlinearity matters; the MLP & the forward pass; vectors/matrices/tensors, shapes, broadcasting, matmul; train/val/test split & cross-validation; overfitting/underfitting & the bias-variance tradeoff; regularization (L1/L2/weight decay, dropout, early stopping, batch/layer norm); evaluation metrics (accuracy, precision/recall/F1, ROC/AUC); optimizers (momentum, Adam, AdamW, LR schedules/warmup); parameters vs hyperparameters; why GPUs (CUDA, mixed precision); classical ML (decision trees, random forests, XGBoost/LightGBM, kNN, k-means); embeddings as a general ML concept (word2vec, recommenders); CNNs/RNNs conceptually & why transformers won; PyTorch tensors & autograd; PyTorch `nn.Module`; PyTorch `Dataset`/`DataLoader` & the training loop; `model.eval()`/`torch.no_grad()` & saving/loading models.
+**BUILD:** A 2-layer NN on a toy dataset (e.g. XOR), implemented twice — once by hand in pure Python/NumPy (manual forward pass, manual backprop, manual gradient-descent update, no autograd) and once in PyTorch (`nn.Module`, autograd, `DataLoader`, `AdamW`) — confirm both converge to the same loss curve. The exercise that demystifies backprop and builds PyTorch muscle memory reused in every later module.
+**UNLOCKS:** explain gradient descent & backprop to a backend engineer; why nonlinear activations are needed; parameters vs hyperparameters; cross-entropy vs MSE (and perplexity); overfitting + three fixes; bias-variance tradeoff; SGD vs Adam vs AdamW (and why AdamW trains LLMs); what's a tensor & why GPUs; PyTorch training loop walkthrough; `model.eval()` vs `torch.no_grad()`; when to use XGBoost over a neural net; what an embedding is before LLM-specific embeddings.
+**DRILL:** Write a 2-layer MLP in PyTorch from memory in under 10 minutes (`nn.Module`, `AdamW`, the 5-line training loop), narrating each line to a non-ML engineer.
+
 ---
 
-## Module 1 — LLM foundations playground — Week 4–6
+## Module 1 — LLM foundations playground — Week 6–8
 
 **TOPICS:** transformer architecture; self-attention (Query/Key/Value, scaled dot-product); multi-head attention; feedforward layers, residual connections, layer normalization; positional encoding (sinusoidal, learned, RoPE, ALiBi) & context-length extrapolation (YaRN); tokenization (BPE, WordPiece, SentencePiece, vocabulary, special tokens, subwords); token count → cost & context; embeddings & semantic similarity; embedding models & dimensions; context window & "lost in the middle"; decoding/sampling (greedy, beam, temperature, top-p, top-k, repetition penalty, logits); quantization (8-bit, 4-bit/NF4, GGUF) & tradeoffs; training pipeline (pretraining → SFT → RLHF/DPO, reward model, PPO); scaling laws (Chinchilla 20:1), emergent abilities, inference-time compute / reasoning models; open vs closed models (GPT, Claude, Llama, Mistral, Gemini); causes of hallucination; (intro) multimodal models.
 **BUILD:** A "model lab": tokenizer visualizer + token counter; temperature/top-p/top-k sliders showing output change; one interface over 3 providers (Anthropic, OpenAI, local Ollama); per-call cost & latency logging.
@@ -41,7 +48,7 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 
 ---
 
-## Module 2 — Production RAG service — Week 7–10  ← hero project
+## Module 2 — Production RAG service — Week 9–12  ← hero project
 
 **TOPICS:** RAG pipeline (ingest → chunk → embed → store → retrieve → augment → generate); document loading & parsing (PDF, tables, layout, OCR, HTML, Markdown); chunking (fixed-size, overlap, recursive, semantic, parent-child, document-aware) & sizing; embeddings (model choice, normalization, Matryoshka, anisotropy); vector DBs (pgvector, Qdrant, Weaviate, Pinecone, Chroma, Milvus, FAISS); ANN indexes (HNSW, IVF, product quantization) & metadata filtering; sharding & re-indexing (zero-downtime); retrieval (dense, sparse/BM25, hybrid, reciprocal rank fusion, top-k, MMR); reranking (cross-encoders); query transformation (HyDE, decomposition, step-back, multi-query, rewriting); advanced RAG (corrective/CRAG, self-RAG, agentic RAG, GraphRAG, contextual retrieval); citations & source attribution; access control (RBAC/ABAC, per-user/per-doc) & multi-tenancy; scaling to millions of docs under latency budgets + caching; freshness/index updates, knowledge conflict, dedup; RAG metrics (faithfulness, answer relevance, context precision/recall, RAGAS); RAG vs fine-tuning vs long-context.
 **BUILD:** FastAPI RAG service over a real corpus (few-thousand docs/PDFs): chunk → embed → store (pgvector, then a managed DB) → hybrid retrieval (dense+BM25+RRF) → cross-encoder rerank → generate with citations. Measure NDCG@k before/after rerank. Small UI.
@@ -50,7 +57,7 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 
 ---
 
-## Module 3 — Agent + MCP — Week 11–13
+## Module 3 — Agent + MCP — Week 13–15
 
 **TOPICS:** agent vs chain vs simple call; reasoning loops (ReAct, ReWoo, Plan-and-Execute, Reflexion, LLMCompiler); tool/function calling, tool design & JSON schemas; memory (in-context buffer, vector/semantic, episodic, procedural, summarization); planning & self-correction; single vs multi-agent (orchestrator-worker, supervisor, hierarchical, debate) & why most break past ~5 steps; frameworks (LangChain, LangGraph state machines, LlamaIndex, CrewAI, AutoGen); MCP (JSON-RPC, transports: stdio/HTTP-SSE/streamable; primitives: tools/resources/prompts/sampling; capability negotiation, federation; security: tool poisoning, TOFU pinning, least-privilege); control (loop/step caps, timeouts, infinite-loop handling); cost (token budget, model routing, caching); human-in-the-loop (approval gates, interruption semantics, durable execution, idempotent resume); agent failure-mode taxonomy (specification, execution, environmental, alignment); agent guardrails.
 **BUILD:** A multi-step agent (research/triage over APIs + your RAG store): ReAct loop, tool defs, short/long-term memory, step cap, human approval gate before risky actions, one MCP integration; orchestrate with LangGraph or CrewAI.
@@ -59,7 +66,7 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 
 ---
 
-## Module 4 — Evaluation + observability harness — Week 11–14 (parallel)
+## Module 4 — Evaluation + observability harness — Week 13–16 (parallel)
 
 **TOPICS:** why eval is hard (non-determinism); offline eval (curated/golden sets); online eval (LLM-as-judge + its biases/failure modes); metrics (task success; faithfulness, answer relevance, context precision/recall; tool-call accuracy; trajectory vs outcome; why BLEU/ROUGE/exact-match are limited); RAGAS; agent eval & the GAIA gap; regression testing on non-deterministic output; non-deterministic CI gates; shadow evaluation; A/B testing; benchmark contamination; observability (OpenTelemetry, GenAI semantic conventions, spans, attributes, trace propagation; Langfuse/LangSmith/Helicone); production metrics (p50/p95/p99 latency, token usage, cost-per-task, error rate); drift & silent quality decay; layered hallucination defense; guardrails (input/output validation, PII, prompt injection, jailbreak, content moderation).
 **BUILD:** An eval harness for your RAG + agent: offline set (~150 examples) + online LLM-as-judge over traces + a CI gate that blocks deploys on regression; RAGAS metrics; OpenTelemetry → Langfuse/LangSmith dashboard (latency, tokens, cost-per-task).
@@ -68,7 +75,7 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 
 ---
 
-## Module 5 — Fine-tuning run — Week 15–16
+## Module 5 — Fine-tuning run — Week 17–18
 
 **TOPICS:** when to fine-tune (vs RAG/prompt); training types (pretraining, continued pretraining, SFT, instruction tuning, alignment: RLHF/DPO/ORPO); PEFT (LoRA, QLoRA, adapters, prefix tuning); quantization for training (4-bit/NF4, bitsandbytes); GPU-memory math; distributed training (FSDP, ZeRO/DeepSpeed); data prep (instruction formatting, chat templates, loss masking, data quality > quantity); catastrophic forgetting & mitigation; evaluating fine-tunes; serving many fine-tunes (multi-LoRA); privacy/security in training data (PII exclusion, masking, provenance); Hugging Face stack (`transformers`, `peft`, `trl`, `datasets`, Hub).
 **BUILD:** One real QLoRA fine-tune of a small open model (Llama/Mistral 7–8B) on Colab/Lambda for a narrow task; publish the adapter to HF Hub; compare tuned-small vs prompted-large on cost/latency/quality.
@@ -77,7 +84,7 @@ A learn-by-doing prep plan for the ₹25–50 LPA LLM/GenAI engineer switch. Eve
 
 ---
 
-## Module 6 — Go live: serving, cost & production system design — Week 17–18
+## Module 6 — Go live: serving, cost & production system design — Week 19–20
 
 **TOPICS:** LLM serving (vLLM, SGLang, TGI; continuous batching; KV-cache reuse; paged attention); inference optimization (quantization, speculative decoding, prompt caching, semantic caching); cost optimization (model routing, prompt compression, caching, batching); scaling (load balancing, autoscaling, rate limiting, queueing, backpressure & overflow path); latency (streaming, time-to-first-token, SLAs, sync vs async, QPS); reliability (retries, fallbacks, circuit breakers, timeouts); guardrails/safety (prompt injection, PII, content filtering, output validation, jailbreak defense); security/compliance (access control, audit logging, data residency, RBAC/ABAC); deployment (Docker, Kubernetes, CI/CD, IaC); cloud AI (AWS Bedrock/SageMaker, GCP Vertex, Azure OpenAI); LLMOps (model & prompt versioning, monitoring, rollback, canary); AI system-design patterns.
 **BUILD:** Deploy one project as a **live, always-on, monitored** service — Dockerized on AWS/GCP, CI/CD, usage+cost tracking, rate limiting, retries, prompt-injection/PII guardrails, public demo link. Keep it running.
