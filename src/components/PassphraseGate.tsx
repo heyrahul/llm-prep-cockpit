@@ -43,7 +43,7 @@ export default function PassphraseGate() {
             <Lock className="h-5 w-5 text-slate-950" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-slate-100 light:text-slate-900">LLM Engineer Prep</h1>
+            <h1 className="text-lg font-semibold text-slate-100 light:text-slate-900">Daily Drills</h1>
             <p className="text-xs text-slate-400 light:text-slate-500">Enter the passphrase to unlock your cockpit</p>
           </div>
         </div>

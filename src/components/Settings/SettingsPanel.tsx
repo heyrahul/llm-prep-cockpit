@@ -22,7 +22,7 @@ export default function SettingsPanel() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `llm-prep-cockpit-progress-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `daily-drills-progress-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }

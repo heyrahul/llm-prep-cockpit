@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-6xl items-center gap-2 px-3 py-2.5 sm:gap-4 sm:px-6">
           <NavLink to="/" className="flex items-center gap-2 font-semibold">
             <span className="text-lg">🐉</span>
-            <span className="hidden gradient-text sm:inline">LLM Engineer Prep</span>
+            <span className="hidden gradient-text sm:inline">Daily Drills</span>
           </NavLink>
 
           <nav className="flex flex-1 items-center gap-1 overflow-x-auto sm:gap-2">
