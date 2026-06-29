@@ -7,7 +7,7 @@ function TrackRow({ title, modules }: { title: string; modules: Module[] }) {
   const topicStatus = useProgressStore((s) => s.topicStatus);
   return (
     <div>
-      <h3 className="mb-3 text-sm font-semibold text-slate-400">{title}</h3>
+      <h3 className="mb-3 text-sm font-semibold text-slate-400 light:text-slate-500">{title}</h3>
       <div className="relative">
         <div
           aria-hidden

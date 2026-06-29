@@ -40,7 +40,7 @@ export default function LevelUpModal() {
               className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 via-purple-500/10 to-pink-400/10"
             />
             <Sparkles className="mx-auto mb-3 h-10 w-10 text-amber-300" />
-            <p className="text-sm font-medium uppercase tracking-wide text-slate-400">Level up</p>
+            <p className="text-sm font-medium uppercase tracking-wide text-slate-400 light:text-slate-500">Level up</p>
             <p className="mt-1 text-2xl font-bold gradient-text">Level {pendingLevelUp.level}</p>
             <p className="mt-1 text-lg text-slate-200 light:text-slate-800">{pendingLevelUp.title}</p>
             <button

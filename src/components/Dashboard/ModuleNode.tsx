@@ -5,15 +5,15 @@ import type { Module } from '../../types';
 import type { ModuleState } from '../../lib/stats';
 
 const STATE_RING: Record<ModuleState, string> = {
-  'not-started': 'ring-white/10',
+  'not-started': 'ring-white/10 light:ring-slate-300',
   'in-progress': 'ring-cyan-400/60',
   mastered: 'ring-emerald-400/70',
 };
 
 const STATE_BG: Record<ModuleState, string> = {
-  'not-started': 'bg-white/5 text-slate-300',
-  'in-progress': 'bg-cyan-500/10 text-cyan-200',
-  mastered: 'bg-emerald-500/10 text-emerald-200',
+  'not-started': 'bg-white/5 text-slate-300 light:bg-slate-100 light:text-slate-500',
+  'in-progress': 'bg-cyan-500/10 text-cyan-200 light:bg-cyan-100 light:text-cyan-700',
+  mastered: 'bg-emerald-500/10 text-emerald-200 light:bg-emerald-100 light:text-emerald-700',
 };
 
 interface Props {
@@ -45,7 +45,7 @@ export default function ModuleNode({ module, state, pct }: Props) {
         )}
       </motion.div>
       <div className="text-center">
-        <p className="line-clamp-2 text-[11px] font-medium leading-tight text-slate-300 group-hover:text-slate-100 light:text-slate-600">
+        <p className="line-clamp-2 text-[11px] font-medium leading-tight text-slate-300 group-hover:text-slate-100 light:text-slate-600 light:group-hover:text-slate-900">
           {module.title}
         </p>
         <p className="text-[10px] text-slate-500">{Math.round(pct * 100)}%</p>

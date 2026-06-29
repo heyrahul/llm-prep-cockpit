@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Swords, ThumbsDown, ThumbsUp, TimerReset } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import { Eye, EyeOff, Swords, ThumbsDown, ThumbsUp, TimerReset } from 'lucide-react';
 import { useProgressStore } from '../../store/useProgressStore';
 import { allQuestionsFlat, type FlatQuestion } from '../../lib/stats';
 import { shuffle } from '../../lib/shuffle';
@@ -22,6 +25,7 @@ export default function MockRoundMode() {
   const [index, setIndex] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(perQuestionSeconds);
   const [outcomes, setOutcomes] = useState<Outcome[]>([]);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   const pool = moduleId === 'all' ? allQuestions : allQuestions.filter((q) => q.moduleId === moduleId);
 
@@ -39,6 +43,7 @@ export default function MockRoundMode() {
     if (current && outcome !== 'skipped') rateQuestion(current.id, outcome);
     const nextOutcomes = [...outcomes, outcome];
     setOutcomes(nextOutcomes);
+    setShowAnswer(false);
     if (index + 1 < round.length) {
       setIndex(index + 1);
       setSecondsLeft(perQuestionSeconds);
@@ -71,17 +76,13 @@ export default function MockRoundMode() {
           <h1 className="flex items-center gap-2 text-xl font-bold text-slate-100 light:text-slate-900">
             <Swords className="h-5 w-5 text-amber-400" /> Mock round
           </h1>
-          <p className="text-sm text-slate-400">N random questions, back-to-back, against the clock.</p>
+          <p className="text-sm text-slate-400 light:text-slate-500">N random questions, back-to-back, against the clock.</p>
         </div>
 
         <div className="glass-card space-y-4 p-5">
           <label className="block">
-            <span className="mb-1 block text-xs text-slate-400">Module</span>
-            <select
-              value={moduleId}
-              onChange={(e) => setModuleId(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200"
-            >
+            <span className="mb-1 block text-xs text-slate-400 light:text-slate-500">Module</span>
+            <select value={moduleId} onChange={(e) => setModuleId(e.target.value)} className="field">
               <option value="all">All modules</option>
               {content.modules.map((m) => (
                 <option key={m.id} value={m.id}>
@@ -92,7 +93,7 @@ export default function MockRoundMode() {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-xs text-slate-400">Number of questions: {count}</span>
+            <span className="mb-1 block text-xs text-slate-400 light:text-slate-500">Number of questions: {count}</span>
             <input
               type="range"
               min={3}
@@ -104,7 +105,9 @@ export default function MockRoundMode() {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-xs text-slate-400">Seconds per question: {perQuestionSeconds}</span>
+            <span className="mb-1 block text-xs text-slate-400 light:text-slate-500">
+              Seconds per question: {perQuestionSeconds}
+            </span>
             <input
               type="range"
               min={20}
@@ -123,7 +126,9 @@ export default function MockRoundMode() {
           >
             Start mock round
           </button>
-          {pool.length === 0 && <p className="text-xs text-rose-400">No questions available for this module.</p>}
+          {pool.length === 0 && (
+            <p className="text-xs text-rose-400 light:text-rose-600">No questions available for this module.</p>
+          )}
         </div>
       </div>
     );
@@ -134,13 +139,13 @@ export default function MockRoundMode() {
     const pct = secondsLeft / perQuestionSeconds;
     return (
       <div className="mx-auto max-w-2xl space-y-5">
-        <div className="flex items-center justify-between text-sm text-slate-400">
+        <div className="flex items-center justify-between text-sm text-slate-400 light:text-slate-500">
           <span>
             Question {index + 1} / {round.length}
           </span>
-          <span className="font-mono text-lg tabular-nums text-amber-300">{secondsLeft}s</span>
+          <span className="font-mono text-lg tabular-nums text-amber-300 light:text-amber-700">{secondsLeft}s</span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/10 light:bg-slate-200">
           <div
             className="h-full rounded-full bg-gradient-to-r from-amber-400 to-rose-400 transition-all duration-300"
             style={{ width: `${pct * 100}%` }}
@@ -159,16 +164,42 @@ export default function MockRoundMode() {
           </span>
         </motion.div>
 
+        <div className="flex justify-center">
+          <button
+            onClick={() => setShowAnswer((s) => !s)}
+            className="btn-soft w-auto px-3 py-1.5 text-xs"
+          >
+            {showAnswer ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+            {showAnswer ? 'Hide answer' : 'Peek at model answer'}
+          </button>
+        </div>
+        <AnimatePresence>
+          {showAnswer && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="glass-card markdown-body max-h-48 overflow-y-auto p-4 text-xs text-slate-300 light:text-slate-700 [&_strong]:text-cyan-300 light:[&_strong]:text-cyan-700">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                  {current.answer}
+                </ReactMarkdown>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => record('shaky')}
-            className="flex items-center gap-2 rounded-xl bg-amber-500/15 px-5 py-2.5 text-sm font-medium text-amber-300 hover:bg-amber-500/25"
+            className="flex items-center gap-2 rounded-xl bg-amber-500/15 px-5 py-2.5 text-sm font-medium text-amber-300 hover:bg-amber-500/25 light:bg-amber-100 light:text-amber-700 light:hover:bg-amber-200"
           >
             <ThumbsDown className="h-4 w-4" /> Shaky
           </button>
           <button
             onClick={() => record('got-it')}
-            className="flex items-center gap-2 rounded-xl bg-emerald-500/15 px-5 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/25"
+            className="flex items-center gap-2 rounded-xl bg-emerald-500/15 px-5 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/25 light:bg-emerald-100 light:text-emerald-700 light:hover:bg-emerald-200"
           >
             <ThumbsUp className="h-4 w-4" /> Got it
           </button>
@@ -186,16 +217,16 @@ export default function MockRoundMode() {
       <h1 className="text-xl font-bold text-slate-100 light:text-slate-900">Round complete</h1>
       <div className="glass-card grid grid-cols-3 gap-3 p-5">
         <div>
-          <p className="text-2xl font-bold text-emerald-300">{gotIt}</p>
-          <p className="text-xs text-slate-400">Got it</p>
+          <p className="text-2xl font-bold text-emerald-300 light:text-emerald-600">{gotIt}</p>
+          <p className="text-xs text-slate-400 light:text-slate-500">Got it</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-amber-300">{shaky}</p>
-          <p className="text-xs text-slate-400">Shaky</p>
+          <p className="text-2xl font-bold text-amber-300 light:text-amber-600">{shaky}</p>
+          <p className="text-xs text-slate-400 light:text-slate-500">Shaky</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-slate-400">{skipped}</p>
-          <p className="text-xs text-slate-400">Skipped</p>
+          <p className="text-2xl font-bold text-slate-400 light:text-slate-500">{skipped}</p>
+          <p className="text-xs text-slate-400 light:text-slate-500">Skipped</p>
         </div>
       </div>
       <button

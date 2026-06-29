@@ -75,14 +75,16 @@ export default function FlashcardMode() {
     <div className="mx-auto max-w-2xl space-y-5">
       <div>
         <h1 className="text-xl font-bold text-slate-100 light:text-slate-900">Flashcard mode</h1>
-        <p className="text-sm text-slate-400">Active recall over every UNLOCKS question. Self-rated, no answer key.</p>
+        <p className="text-sm text-slate-400 light:text-slate-500">
+          Active recall over every UNLOCKS question. Self-rated, no answer key.
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <select
           value={track}
           onChange={(e) => setTrack(e.target.value as 'all' | 'A' | 'B')}
-          className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200"
+          className="field w-auto px-2.5 py-1.5 text-xs"
         >
           <option value="all">All tracks</option>
           <option value="A">Track A — AI</option>
@@ -91,7 +93,7 @@ export default function FlashcardMode() {
         <select
           value={moduleId}
           onChange={(e) => setModuleId(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200"
+          className="field w-auto px-2.5 py-1.5 text-xs"
         >
           <option value="all">All modules</option>
           {content.modules.map((m) => (
@@ -100,20 +102,17 @@ export default function FlashcardMode() {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200">
+        <label className="btn-soft w-auto px-2.5 py-1.5 text-xs">
           <input type="checkbox" checked={dueOnly} onChange={(e) => setDueOnly(e.target.checked)} />
           Due for review only
         </label>
-        <button
-          onClick={() => setShuffleSeed((s) => s + 1)}
-          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-slate-200 hover:bg-white/10"
-        >
+        <button onClick={() => setShuffleSeed((s) => s + 1)} className="btn-soft w-auto px-2.5 py-1.5 text-xs">
           <Shuffle className="h-3.5 w-3.5" /> Reshuffle
         </button>
       </div>
 
       {!current ? (
-        <div className="glass-card p-8 text-center text-sm text-slate-400">
+        <div className="glass-card p-8 text-center text-sm text-slate-400 light:text-slate-500">
           No cards match these filters {dueOnly && '— nothing due for review right now.'}
         </div>
       ) : (
@@ -125,13 +124,13 @@ export default function FlashcardMode() {
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => rate('shaky')}
-              className="flex items-center gap-2 rounded-xl bg-amber-500/15 px-5 py-2.5 text-sm font-medium text-amber-300 hover:bg-amber-500/25"
+              className="flex items-center gap-2 rounded-xl bg-amber-500/15 px-5 py-2.5 text-sm font-medium text-amber-300 hover:bg-amber-500/25 light:bg-amber-100 light:text-amber-700 light:hover:bg-amber-200"
             >
               <ThumbsDown className="h-4 w-4" /> Shaky <kbd className="opacity-60">S</kbd>
             </button>
             <button
               onClick={() => rate('got-it')}
-              className="flex items-center gap-2 rounded-xl bg-emerald-500/15 px-5 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/25"
+              className="flex items-center gap-2 rounded-xl bg-emerald-500/15 px-5 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-500/25 light:bg-emerald-100 light:text-emerald-700 light:hover:bg-emerald-200"
             >
               <ThumbsUp className="h-4 w-4" /> Got it <kbd className="opacity-60">G</kbd>
             </button>

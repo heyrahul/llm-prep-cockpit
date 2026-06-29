@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 @import 'highlight.js/styles/github-dark.css';
 
-/* Tailwind v4: switch `dark:` from a media-query strategy to a class strategy
-   so the in-app theme toggle (not just OS preference) controls it. */
+/* Tailwind v4: switch `dark:`/`light:` from a media-query strategy to a class
+   strategy so the in-app theme toggle (not just OS preference) controls it. */
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant light (&:where(.light, .light *));
 
@@ -38,37 +38,71 @@ body {
   border-radius: 0.25rem;
 }
 
-.glass-card {
-  @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.03];
-}
+/* Component-level classes live in Tailwind's "components" layer so that any
+   utility class (e.g. `focus:border-cyan-400/50`) applied alongside still
+   wins over these — matching normal Tailwind override expectations. */
+@layer components {
+  .glass-card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+  }
+  .light .glass-card {
+    @apply border-slate-200 bg-white/85;
+  }
 
-.light .glass-card {
-  @apply border-slate-200 bg-white/80;
-}
+  /* Inputs and selects */
+  .field {
+    @apply w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500;
+  }
+  .light .field {
+    @apply border-slate-300 bg-white text-slate-800 placeholder:text-slate-400;
+  }
 
-.gradient-text {
-  background-image: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-purple));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+  /* Bordered "soft" buttons (settings rows, filter chips, reshuffle, etc.) */
+  .btn-soft {
+    @apply flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 transition hover:bg-white/10;
+  }
+  .light .btn-soft {
+    @apply border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100;
+  }
 
-.markdown-body p {
-  margin: 0.5em 0;
-}
-.markdown-body ul,
-.markdown-body ol {
-  @apply ml-5 list-disc space-y-1;
-}
-.markdown-body a {
-  @apply text-cyan-400 underline-offset-2 hover:underline;
-}
-.markdown-body code {
-  @apply rounded bg-white/10 px-1 py-0.5 font-mono text-[0.85em];
-}
-.markdown-body pre code {
-  @apply block rounded-lg bg-transparent p-0;
-}
-.markdown-body pre {
-  @apply overflow-x-auto rounded-lg border border-white/10 p-3;
+  /* Subtle list rows (topic checklist items) */
+  .row-item {
+    @apply rounded-xl border border-white/5 bg-white/[0.02] transition hover:border-white/10 hover:bg-white/[0.05];
+  }
+  .light .row-item {
+    @apply border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100;
+  }
+
+  .gradient-text {
+    background-image: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .markdown-body p {
+    margin: 0.5em 0;
+  }
+  .markdown-body ul,
+  .markdown-body ol {
+    @apply ml-5 list-disc space-y-1;
+  }
+  .markdown-body a {
+    @apply text-cyan-400 underline-offset-2 hover:underline;
+  }
+  .markdown-body code {
+    @apply rounded bg-white/10 px-1 py-0.5 font-mono text-[0.85em];
+  }
+  .light .markdown-body code {
+    @apply bg-slate-200;
+  }
+  .markdown-body pre code {
+    @apply block rounded-lg bg-transparent p-0;
+  }
+  .markdown-body pre {
+    @apply overflow-x-auto rounded-lg border border-white/10 p-3;
+  }
+  .light .markdown-body pre {
+    @apply border-slate-200;
+  }
 }

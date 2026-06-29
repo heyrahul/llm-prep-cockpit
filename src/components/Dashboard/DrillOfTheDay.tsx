@@ -29,14 +29,14 @@ export default function DrillOfTheDay() {
         className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br from-cyan-400/20 to-purple-500/20 blur-2xl"
       />
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-semibold text-amber-300">
+        <div className="flex items-center gap-2 text-sm font-semibold text-amber-300 light:text-amber-700">
           <Swords className="h-4 w-4" />
           Drill of the day
         </div>
         <button
           onClick={() => setReroll((r) => r + 1)}
           title="Shuffle"
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-slate-100"
+          className="rounded-lg p-1.5 text-slate-400 hover:bg-white/5 hover:text-slate-100 light:hover:bg-slate-100 light:hover:text-slate-900"
         >
           <Shuffle className="h-3.5 w-3.5" />
         </button>
@@ -46,7 +46,7 @@ export default function DrillOfTheDay() {
         <span>
           {item.moduleEmoji} {item.moduleTitle}
         </span>
-        <Link to={`/module/${item.moduleId}`} className="font-medium text-cyan-400 hover:underline">
+        <Link to={`/module/${item.moduleId}`} className="font-medium text-cyan-400 hover:underline light:text-cyan-600">
           Open module →
         </Link>
       </div>

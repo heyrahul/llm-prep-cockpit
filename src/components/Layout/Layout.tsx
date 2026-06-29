@@ -52,32 +52,36 @@ export default function Layout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <div
               title={`${streak.count}-day streak`}
-              className="flex items-center gap-1 rounded-lg bg-orange-500/10 px-2 py-1 text-xs font-medium text-orange-300"
+              className="flex items-center gap-1 rounded-lg bg-orange-500/10 px-2 py-1 text-xs font-medium text-orange-300 light:text-orange-700"
             >
               <Flame className="h-3.5 w-3.5" />
               {streak.count}
             </div>
             <div
               title={`Level ${level.level}: ${level.title}`}
-              className="hidden items-center gap-1 rounded-lg bg-purple-500/10 px-2 py-1 text-xs font-medium text-purple-300 sm:flex"
+              className="hidden items-center gap-1 rounded-lg bg-purple-500/10 px-2 py-1 text-xs font-medium text-purple-300 sm:flex light:text-purple-700"
             >
               Lv.{level.level} {level.title}
             </div>
             <button
               onClick={() => setSearchOpen(true)}
               title="Search (/)"
-              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-slate-100"
+              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-slate-100 light:hover:bg-slate-100 light:hover:text-slate-900"
             >
               <Search className="h-4 w-4" />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
               title="Settings"
-              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-slate-100"
+              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-slate-100 light:hover:bg-slate-100 light:hover:text-slate-900"
             >
               <Settings className="h-4 w-4" />
             </button>
-            <button onClick={lock} title="Lock" className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-rose-300">
+            <button
+              onClick={lock}
+              title="Lock"
+              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-rose-300 light:hover:bg-rose-50 light:hover:text-rose-600"
+            >
               <Lock className="h-4 w-4" />
             </button>
           </div>

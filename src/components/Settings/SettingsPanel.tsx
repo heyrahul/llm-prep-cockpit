@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Download, Lock, Moon, ShieldAlert, Sun, Upload, Volume2, VolumeX, X } from 'lucide-react';
+import { Download, HardDrive, Lock, Moon, Sun, Upload, Volume2, VolumeX, X } from 'lucide-react';
 import { useUiStore } from '../../store/useUiStore';
 import { useProgressStore } from '../../store/useProgressStore';
 
@@ -59,51 +59,44 @@ export default function SettingsPanel() {
           >
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-100 light:text-slate-900">Settings</h2>
-              <button onClick={() => setOpen(false)} className="rounded p-1 text-slate-400 hover:text-slate-100">
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded p-1 text-slate-400 hover:text-slate-100 light:hover:text-slate-900"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="space-y-3">
-              <button
-                onClick={toggleTheme}
-                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
-              >
+              <button onClick={toggleTheme} className="btn-soft w-full justify-between">
                 <span className="flex items-center gap-2">
                   {settings.theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />} Theme
                 </span>
-                <span className="text-slate-400">{settings.theme === 'dark' ? 'Dark' : 'Light'}</span>
+                <span className="text-slate-400 light:text-slate-500">{settings.theme === 'dark' ? 'Dark' : 'Light'}</span>
               </button>
 
-              <button
-                onClick={toggleSound}
-                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
-              >
+              <button onClick={toggleSound} className="btn-soft w-full justify-between">
                 <span className="flex items-center gap-2">
                   {settings.soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />} Sound
                   effects
                 </span>
-                <span className="text-slate-400">{settings.soundEnabled ? 'On' : 'Off'}</span>
+                <span className="text-slate-400 light:text-slate-500">{settings.soundEnabled ? 'On' : 'Off'}</span>
               </button>
             </div>
 
             <div className="mt-6 space-y-2">
               <p className="text-xs font-semibold uppercase text-slate-500">Portability</p>
-              <button
-                onClick={handleExport}
-                className="flex w-full items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 hover:bg-white/10"
-              >
+              <button onClick={handleExport} className="btn-soft w-full">
                 <Download className="h-4 w-4" /> Export progress
               </button>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex w-full items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 hover:bg-white/10"
-              >
+              <button onClick={() => fileInputRef.current?.click()} className="btn-soft w-full">
                 <Upload className="h-4 w-4" /> Import progress
               </button>
               <input ref={fileInputRef} type="file" accept="application/json" className="hidden" onChange={handleImportFile} />
               {message && (
-                <p className={`text-xs ${message.ok ? 'text-emerald-400' : 'text-rose-400'}`}>{message.text}</p>
+                <p className={`text-xs ${message.ok ? 'text-emerald-400 light:text-emerald-600' : 'text-rose-400 light:text-rose-600'}`}>
+                  {message.text}
+                </p>
               )}
             </div>
 
@@ -113,18 +106,15 @@ export default function SettingsPanel() {
                   lock();
                   setOpen(false);
                 }}
-                className="flex w-full items-center gap-2 rounded-lg border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-300 hover:bg-rose-500/20"
+                className="flex w-full items-center gap-2 rounded-lg border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-300 hover:bg-rose-500/20 light:bg-rose-50 light:text-rose-600 light:hover:bg-rose-100"
               >
                 <Lock className="h-4 w-4" /> Lock app
               </button>
             </div>
 
-            <div className="mt-6 flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 p-3 text-xs text-amber-200/80">
-              <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              <p>
-                The passphrase gate is obfuscation-grade, not real authentication. Progress lives only in this
-                browser's localStorage — export it before switching devices or clearing site data.
-              </p>
+            <div className="mt-6 flex items-start gap-2 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-xs text-slate-400 light:border-slate-200 light:bg-slate-50 light:text-slate-500">
+              <HardDrive className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <p>Progress lives only in this browser's localStorage — export it before switching devices or clearing site data.</p>
             </div>
           </motion.aside>
         </>

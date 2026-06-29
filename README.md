@@ -34,8 +34,10 @@ gitignored file the app decrypts in-browser after you enter the passphrase.
 
 All syllabus data lives in [`src/data/content.json`](src/data/content.json), typed by
 [`src/types.ts`](src/types.ts) (`Module`, `Topic`, `Question`). Add/edit modules there — no other code
-changes needed. The two narrative blurbs on the **Playbook** page live under `notes.capstone` /
-`notes.finalWeeks` in the same file.
+changes needed. Every topic has an `explanation` (shown when you expand the row in the checklist) and
+every question has an `answer` (shown on the back of its flashcard) — the app is meant to be fully
+self-contained, so you shouldn't need to look anything up elsewhere while studying. The two narrative
+blurbs on the **Playbook** page live under `notes.capstone` / `notes.finalWeeks` in the same file.
 
 ## Setting the passphrase
 

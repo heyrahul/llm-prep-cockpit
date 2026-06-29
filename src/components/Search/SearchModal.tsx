@@ -54,7 +54,7 @@ export default function SearchModal() {
             onClick={(e) => e.stopPropagation()}
             className="glass-card w-full max-w-lg overflow-hidden bg-slate-900/95 light:bg-white"
           >
-            <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+            <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3 light:border-slate-200">
               <Search className="h-4 w-4 text-slate-400" />
               <input
                 ref={inputRef}
@@ -63,7 +63,10 @@ export default function SearchModal() {
                 placeholder="Search modules, topics, questions…"
                 className="flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none light:text-slate-900"
               />
-              <button onClick={() => setOpen(false)} className="rounded p-1 text-slate-400 hover:text-slate-100">
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded p-1 text-slate-400 hover:text-slate-100 light:hover:text-slate-900"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -78,7 +81,7 @@ export default function SearchModal() {
                     <button
                       key={m.id}
                       onClick={() => go(m.id)}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-slate-200 hover:bg-white/5"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-slate-200 hover:bg-white/5 light:text-slate-700 light:hover:bg-slate-100"
                     >
                       <span>{m.emoji}</span> {m.title}
                     </button>
@@ -93,7 +96,7 @@ export default function SearchModal() {
                     <button
                       key={t.id}
                       onClick={() => go(t.moduleId)}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-slate-300 hover:bg-white/5"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-slate-300 hover:bg-white/5 light:text-slate-700 light:hover:bg-slate-100"
                     >
                       <span>{t.moduleEmoji}</span>
                       <span className="line-clamp-1">{t.label}</span>
@@ -109,7 +112,7 @@ export default function SearchModal() {
                     <button
                       key={qq.id}
                       onClick={() => go(qq.moduleId)}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-slate-300 hover:bg-white/5"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-slate-300 hover:bg-white/5 light:text-slate-700 light:hover:bg-slate-100"
                     >
                       <span>{qq.moduleEmoji}</span>
                       <span className="line-clamp-1">{qq.text}</span>

@@ -22,7 +22,10 @@ export default function ModuleView() {
 
   return (
     <div className="space-y-6">
-      <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 light:text-slate-500 light:hover:text-slate-900"
+      >
         <ArrowLeft className="h-4 w-4" /> Back to cockpit
       </Link>
 
@@ -32,16 +35,16 @@ export default function ModuleView() {
             <span className="text-3xl">{module.emoji}</span>
             <div>
               <h1 className="text-xl font-bold text-slate-100 light:text-slate-900">{module.title}</h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 light:text-slate-500">
                 {module.weeks} · Track {module.track} {module.isHero && '· 🐉 Hero project'}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-sm font-semibold text-slate-200">
+            <p className="text-sm font-semibold text-slate-200 light:text-slate-700">
               {mastered}/{total} topics mastered
             </p>
-            <div className="mt-1 h-1.5 w-32 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-1 h-1.5 w-32 overflow-hidden rounded-full bg-white/10 light:bg-slate-200">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 transition-all"
                 style={{ width: `${pct * 100}%` }}
@@ -50,7 +53,7 @@ export default function ModuleView() {
           </div>
         </div>
 
-        <div className="markdown-body mt-4 text-sm text-slate-300 light:text-slate-700 [&_strong]:text-cyan-300">
+        <div className="markdown-body mt-4 text-sm text-slate-300 light:text-slate-700 [&_strong]:text-cyan-300 light:[&_strong]:text-cyan-700">
           <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
             {module.build}
           </ReactMarkdown>
@@ -58,12 +61,14 @@ export default function ModuleView() {
       </div>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">Topics</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 light:text-slate-500">Topics</h2>
         <TopicChecklist topics={module.topics} />
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">Unlocks — flashcards</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 light:text-slate-500">
+          Unlocks — flashcards
+        </h2>
         <UnlocksFlipCards questions={module.unlocks} />
       </section>
 

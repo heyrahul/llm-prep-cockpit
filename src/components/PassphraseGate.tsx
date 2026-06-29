@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, ShieldAlert } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useProgressStore } from '../store/useProgressStore';
 
 export default function PassphraseGate() {
@@ -22,7 +22,7 @@ export default function PassphraseGate() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 light:bg-slate-50">
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 opacity-30"
@@ -43,8 +43,8 @@ export default function PassphraseGate() {
             <Lock className="h-5 w-5 text-slate-950" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-slate-100">LLM Engineer Prep</h1>
-            <p className="text-xs text-slate-400">Enter the passphrase to unlock your cockpit</p>
+            <h1 className="text-lg font-semibold text-slate-100 light:text-slate-900">LLM Engineer Prep</h1>
+            <p className="text-xs text-slate-400 light:text-slate-500">Enter the passphrase to unlock your cockpit</p>
           </div>
         </div>
 
@@ -54,14 +54,14 @@ export default function PassphraseGate() {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Passphrase"
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-400/50"
+          className="field focus:border-cyan-400/50"
         />
 
         {error && (
           <motion.p
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
-            className="mt-2 text-sm text-rose-400"
+            className="mt-2 text-sm text-rose-400 light:text-rose-600"
           >
             {error}
           </motion.p>
@@ -74,15 +74,6 @@ export default function PassphraseGate() {
         >
           {busy ? 'Unlocking…' : 'Unlock'}
         </button>
-
-        <div className="mt-5 flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 p-3 text-xs text-amber-200/80">
-          <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" />
-          <p>
-            This is <strong>obfuscation-grade privacy, not real authentication</strong> — anyone with the
-            passphrase can read the content client-side. Fine for personal study notes; don't put real secrets
-            here.
-          </p>
-        </div>
       </motion.form>
     </div>
   );

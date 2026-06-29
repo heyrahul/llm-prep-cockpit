@@ -3,11 +3,13 @@ export type ItemStatus = 'not-started' | 'learning' | 'shaky' | 'mastered';
 export interface Topic {
   id: string;
   label: string;
+  explanation: string;
 }
 
 export interface Question {
   id: string;
   text: string;
+  answer: string;
 }
 
 export interface Module {
