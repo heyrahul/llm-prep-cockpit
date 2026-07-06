@@ -359,6 +359,41 @@
   .flow-label { fill: var(--text); font: 700 12px var(--font-sans); }
   .flow-arrow { stroke: var(--fc); stroke-width: 2; }
 
+  /* ---------- Code examples ---------- */
+  :root {
+    --tok-k: #ff6bcb; --tok-s: #7ee787; --tok-c: #7d7f9c; --tok-n: #ffb454; --tok-f: #66d9ef;
+  }
+  :root[data-theme="light"] { --tok-k: #c92e8f; --tok-s: #1c9a55; --tok-c: #8886a3; --tok-n: #c1790c; --tok-f: #0f8c9c; }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) { --tok-k: #c92e8f; --tok-s: #1c9a55; --tok-c: #8886a3; --tok-n: #c1790c; --tok-f: #0f8c9c; }
+  }
+
+  .example-block { margin-bottom: 16px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: #0e0f1a; }
+  :root[data-theme="light"] .example-block { background: #1c1b2e; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .example-block { background: #1c1b2e; } }
+  .example-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 8px 12px; background: color-mix(in srgb, var(--pc) 22%, #0e0f1a);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .example-label { font-size: 12px; font-weight: 700; color: #f2f2fb; }
+  .example-lang { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+  .copy-btn {
+    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #f2f2fb;
+    border-radius: 6px; padding: 4px 9px; font-size: 11px; cursor: pointer; flex: none;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.14); }
+  .code-block { margin: 0; padding: 13px 15px; overflow-x: auto; }
+  .code-block code {
+    font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; color: #e7e9f5;
+    white-space: pre; tab-size: 4;
+  }
+  .tok-k { color: var(--tok-k); font-weight: 600; }
+  .tok-s { color: var(--tok-s); }
+  .tok-c { color: var(--tok-c); font-style: italic; }
+  .tok-n { color: var(--tok-n); }
+  .tok-f { color: var(--tok-f); }
+
   details.qa { border-bottom: 1px solid var(--border); padding: 11px 0; }
   details.qa summary { cursor: pointer; font-weight: 700; font-size: 14px; list-style: none; }
   details.qa summary::-webkit-details-marker { display: none; }
@@ -452,6 +487,45 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  // ---------- Tiny Python syntax highlighter (keywords / strings / comments / numbers / calls) ----------
+  const PY_KEYWORDS = "def class import from return if elif else for while in is not and or True False None try except finally with as pass break continue lambda yield raise global nonlocal assert del async await self";
+  const PY_TOKEN_RE = new RegExp(
+    "(#.*$)" +                                              // comment
+    "|(\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?'''|\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*')" + // string
+    "|\\b(" + PY_KEYWORDS.split(" ").join("|") + ")\\b" +   // keyword
+    "|\\b(\\d+\\.?\\d*)\\b" +                               // number
+    "|\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\()",                  // function/method call
+    "gm"
+  );
+  function highlightPython(code) {
+    return esc(code).replace(PY_TOKEN_RE, (m, comment, string, keyword, number, call) => {
+      if (comment) return '<span class="tok-c">' + comment + '</span>';
+      if (string) return '<span class="tok-s">' + string + '</span>';
+      if (keyword) return '<span class="tok-k">' + keyword + '</span>';
+      if (number) return '<span class="tok-n">' + number + '</span>';
+      if (call) return '<span class="tok-f">' + call + '</span>';
+      return m;
+    });
+  }
+
+  function renderExamples(examples) {
+    if (!examples || !examples.length) return "";
+    let html = '<section class="block"><h3>Examples</h3>';
+    examples.forEach((ex, i) => {
+      const isPy = !ex.lang || ex.lang === "python";
+      const highlighted = isPy ? highlightPython(ex.code) : esc(ex.code);
+      html += '<div class="example-block">' +
+        '<div class="example-head"><span class="example-label">' + esc(ex.label) + '</span>' +
+        '<span style="display:flex;align-items:center;gap:8px">' +
+        '<span class="example-lang">' + (ex.lang || "python") + '</span>' +
+        '<button type="button" class="copy-btn" data-copy-idx="' + i + '">Copy</button></span></div>' +
+        '<pre class="code-block"><code>' + highlighted + '</code></pre>' +
+        '</div>';
+    });
+    html += '</section>';
+    return html;
+  }
+
   function flowDiagram(steps, phaseVar) {
     const boxW = 136, boxH = 54, gap = 42, padX = 8, svgH = 78;
     const totalW = steps.length * boxW + (steps.length - 1) * gap + padX * 2;
@@ -490,39 +564,255 @@
       ],
       days: [
         { title: "Environment and Language Basics",
-          why: "Before writing any code, you need a safe, repeatable place to run it — this is the Java equivalent of setting up your JDK and a Maven project, but for Python.",
-          topics: ["Install Python.", "Use venv (Python's per-project sandbox, like a local Maven repo just for one project).", "Use pip (Python's package installer — think Maven/Gradle dependencies).", "Understand scripts vs modules (a script you run directly; a module is code you import into other files).", "Learn indentation, dynamic typing, truthiness, exceptions, and basic data structures."],
+          why: "Before writing any code, you need a safe, repeatable place to run it — a project folder with its own installed packages, kept separate from every other project on your machine.",
+          topics: ["Install Python.", "Use venv (creates an isolated space for this project's packages, so different projects never conflict).", "Use pip (Python's package installer — similar to npm, Maven, gem, or Composer if you've used one of those).", "Understand scripts vs modules (a script you run directly; a module is code you import into other files).", "Learn indentation, dynamic typing, truthiness, exceptions, and basic data structures."],
+          examples: [
+            { label: "Your first script", code: `# hello.py
+name = input("What's your name? ")
+print(f"Hello, {name}! Welcome to Python.")` },
+            { label: "Set up a project (terminal commands)", lang: "bash", code: `python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\\Scripts\\activate
+pip install requests
+pip freeze > requirements.txt   # records exact versions for anyone else running this project` },
+            { label: "Basic data structures + truthiness", code: `scores = [92, 75, 88, 60]              # list: ordered, changeable
+student = {"name": "Rui", "age": 26}   # dict: key-value pairs
+point = (10, 20)                       # tuple: ordered, unchangeable
+tags = {"python", "beginner"}          # set: unique values only
+
+if not scores:                         # empty list/dict/string is "falsy"
+    print("No scores yet")
+else:
+    print(f"Average: {sum(scores) / len(scores):.1f}")
+
+try:
+    with open("scores.txt") as f:
+        content = f.read()
+except FileNotFoundError:
+    print("File not found — that's fine, we'll create it later.")` }
+          ],
           practice: ["Create a small CLI script that reads a file and prints word counts.", "Create and activate a virtual environment.", "Install one dependency and freeze dependencies."],
           production: ["Keep dependencies isolated per project.", "Never rely on global Python packages.", "Use .gitignore for virtual environments, cache files, and local data."],
           diagram: flowDiagram(["Python interpreter", "venv (sandbox)", "pip installs packages", "your script runs"], "--p1") },
         { title: "Pythonic Syntax",
-          why: "Python has shortcuts for common loop patterns. Learning them now means you can read other people's code — and interview take-homes — without getting stuck.",
+          why: "Python has compact, expressive ways to write common loop patterns. Learning them early means you can read real Python code — and interview take-homes — without getting stuck.",
           topics: ["List, dict, and set comprehensions (a one-line way to build a new list/dict/set from another).", "Tuple unpacking.", "Slicing.", "Iteration protocols.", "enumerate, zip, any, all, sorted, map, and filter."],
-          practice: ["Rewrite Java-style loops into idiomatic Python.", "Parse a CSV-like text file without Pandas."],
+          examples: [
+            { label: "Comprehensions", code: `numbers = [1, 2, 3, 4, 5, 6]
+
+squares = [n ** 2 for n in numbers]                # list comprehension
+evens_only = [n for n in numbers if n % 2 == 0]    # with a filter
+lookup = {n: n ** 2 for n in numbers}              # dict comprehension
+unique_lengths = {len(w) for w in ["hi", "python", "ok"]}  # set comprehension
+
+print(squares)      # [1, 4, 9, 16, 25, 36]
+print(evens_only)   # [2, 4, 6]` },
+            { label: "enumerate, zip, and friends", code: `names = ["Ana", "Bo", "Chen"]
+scores = [88, 92, 79]
+
+for i, name in enumerate(names, start=1):
+    print(f"{i}. {name}")
+
+for name, score in zip(names, scores):
+    print(f"{name}: {score}")
+
+print(any(s > 90 for s in scores))    # True
+print(all(s > 50 for s in scores))    # True
+print(sorted(scores, reverse=True))   # [92, 88, 79]` },
+            { label: "Slicing", code: `word = "developer"
+print(word[:3])     # 'dev'
+print(word[-3:])    # 'per'
+print(word[::-1])   # 'repoleved' (reversed)
+
+rows = [10, 20, 30, 40, 50]
+print(rows[1:4])    # [20, 30, 40]
+print(rows[::2])    # [10, 30, 50]` }
+          ],
+          practice: ["Rewrite a few verbose loops (the kind you'd write in almost any language) into idiomatic Python.", "Parse a CSV-like text file without Pandas."],
           production: [] },
         { title: "Functions, Modules, and Errors",
           why: "Functions and clean error handling are what turn a script into something you'd trust in front of a real user — or an interviewer.",
-          topics: ["Function arguments.", "Default parameters.", "*args and **kwargs (let a function accept any number of extra arguments).", "Imports.", "Custom exceptions.", "Context managers with `with` (auto-closes files/connections for you)."],
+          topics: ["Function arguments.", "Default parameters.", "*args and **kwargs (let a function accept any number of extra arguments).", "Imports.", "Custom exceptions.", "Context managers with `with` (auto-closes files/connections for you, even if an error happens)."],
+          examples: [
+            { label: "Default args and *args / **kwargs", code: `def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+def total(*numbers):              # collects extra positional args into a tuple
+    return sum(numbers)
+
+def build_profile(**details):     # collects extra keyword args into a dict
+    return details
+
+print(greet("Sam"))                      # Hello, Sam!
+print(greet("Sam", greeting="Hey"))      # Hey, Sam!
+print(total(1, 2, 3, 4))                 # 10
+print(build_profile(role="engineer", years=3))` },
+            { label: "Custom exceptions", code: `class InvalidRowError(Exception):
+    """Raised when a CSV row fails validation."""
+
+def parse_age(value):
+    if not value.isdigit():
+        raise InvalidRowError(f"'{value}' is not a valid age")
+    return int(value)
+
+try:
+    parse_age("thirty")
+except InvalidRowError as e:
+    print(f"Skipping row: {e}")` },
+            { label: "Context managers with with", code: `with open("data.csv") as f:
+    lines = f.readlines()
+# the file is automatically closed here, even if an error happened above` }
+          ],
           practice: ["Build reusable utility functions for file parsing.", "Add error handling for missing files and invalid input."],
           production: [] },
         { title: "Object-Oriented Python",
-          why: "Java developers often reach for classes out of habit. Python rewards restraint — this is where you learn when a class actually earns its place.",
-          topics: ["Classes.", "Dataclasses (classes that auto-generate boilerplate like constructors and equality).", "Properties.", "Class methods and static methods.", "Composition over inheritance."],
+          why: "It's tempting to reach for classes for everything, especially if your background involved a lot of object-oriented design. Python rewards restraint — this is where you learn when a class actually earns its place.",
+          topics: ["Classes.", "Dataclasses (classes that auto-generate boilerplate like constructors and equality checks).", "Properties.", "Class methods and static methods.", "Composition over inheritance."],
+          examples: [
+            { label: "A plain class vs. a dataclass", code: `class StudentPlain:
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+
+from dataclasses import dataclass
+
+@dataclass
+class Student:
+    name: str
+    score: float
+
+s = Student("Amara", 91.5)
+print(s)                             # Student(name='Amara', score=91.5)
+print(s == Student("Amara", 91.5))   # True — equality is generated for you` },
+            { label: "Properties add validation", code: `class Student:
+    def __init__(self, name, score):
+        self.name = name
+        self._score = score
+
+    @property
+    def score(self):
+        return self._score
+
+    @score.setter
+    def score(self, value):
+        if not 0 <= value <= 100:
+            raise ValueError("score must be between 0 and 100")
+        self._score = value
+
+s = Student("Lee", 88)
+s.score = 105   # raises ValueError` },
+            { label: "classmethod and staticmethod", code: `class Student:
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+
+    @classmethod
+    def from_csv_row(cls, row):        # an alternate constructor
+        name, score = row.split(",")
+        return cls(name, float(score))
+
+    @staticmethod
+    def passing(score):                # a helper that doesn't need self
+        return score >= 60
+
+s = Student.from_csv_row("Priya,82")
+print(Student.passing(s.score))   # True` }
+          ],
           practice: ["Model a simple dataset record with dataclass.", "Add validation logic."],
           production: [] },
         { title: "Type Hints and Tooling",
-          why: "Type hints and linters are the closest thing Python has to the compiler safety net you're used to in Java.",
-          topics: ["Type hints.", "Optional, Union, Literal, TypedDict, and generics (ways to describe more precise shapes of data).", "mypy or pyright (type checkers).", "Formatting with black or ruff format.", "Linting with ruff."],
+          why: "Type hints and linters give you a safety net similar to what a compiler checks in statically-typed languages — except here it's opt-in, and checked by a separate tool rather than the language itself.",
+          topics: ["Type hints.", "Optional, Union, Literal, TypedDict, and generics (ways to describe more precise shapes of data).", "mypy or pyright (type checkers that read your hints and flag mismatches).", "Formatting with black or ruff format.", "Linting with ruff."],
+          examples: [
+            { label: "Type hints in practice", code: `from typing import Optional, Union, Literal, TypedDict
+
+class UserRecord(TypedDict):
+    name: str
+    age: int
+
+def find_user(user_id: int) -> Optional[UserRecord]:
+    ...  # returns a UserRecord, or None if not found
+
+def parse_amount(value: Union[str, int]) -> float:
+    return float(value)
+
+Mode = Literal["train", "eval", "predict"]
+
+def run(mode: Mode) -> None:
+    print(f"Running in {mode} mode")` },
+            { label: "Checking and formatting from the terminal", lang: "bash", code: `mypy app.py           # type-check the file
+ruff format .         # auto-format the whole project
+ruff check .          # lint for style and common bugs` }
+          ],
           practice: ["Add type hints to previous scripts.", "Run a formatter and linter."],
           production: ["Use type hints for public functions and service boundaries.", "Use formatting and linting from day one.", "Keep code style automated."] },
         { title: "Testing Basics",
           why: "Untested code is a rumor. Tests are how you prove your code does what you think it does — and keep proving it after you change something.",
-          topics: ["pytest.", "Unit tests.", "Fixtures (reusable setup for tests).", "Parametrized tests (run the same test with many inputs).", "Temporary files in tests."],
+          topics: ["pytest.", "Unit tests.", "Fixtures (reusable setup for tests).", "Parametrized tests (run the same test with many different inputs).", "Temporary files in tests."],
+          examples: [
+            { label: "Your first pytest test", code: `# test_stats.py
+from stats import average
+
+def test_average_of_three_numbers():
+    assert average([10, 20, 30]) == 20
+
+def test_average_raises_on_empty_list():
+    import pytest
+    with pytest.raises(ValueError):
+        average([])` },
+            { label: "Fixtures and parametrized tests", code: `import pytest
+
+@pytest.fixture
+def sample_rows():
+    return [{"name": "A", "score": "90"}, {"name": "B", "score": "70"}]
+
+def test_row_count(sample_rows):
+    assert len(sample_rows) == 2
+
+@pytest.mark.parametrize("value,expected", [
+    ("10", 10), ("0", 0), ("100", 100),
+])
+def test_parse_score(value, expected):
+    assert int(value) == expected` }
+          ],
           practice: ["Add tests for the CLI/file parser.", "Test both success and failure cases."],
           production: ["Tests should cover behavior, not implementation details.", "Keep small pure functions easy to test."] },
         { title: "Mini Project",
           why: "This is where Days 1-6 come together into one small, real program — the first thing in your portfolio that isn't a toy exercise.",
           topics: ["Build: a tested Python CLI that reads a CSV file, validates rows, computes summary statistics, and writes a clean output file."],
+          examples: [
+            { label: "Putting it all together: cli.py", code: `import csv
+from dataclasses import dataclass
+
+class InvalidRowError(Exception):
+    pass
+
+@dataclass
+class Row:
+    name: str
+    score: float
+
+def parse_row(raw: dict) -> Row:
+    if not raw["score"].replace(".", "", 1).isdigit():
+        raise InvalidRowError(f"bad score: {raw['score']}")
+    return Row(raw["name"], float(raw["score"]))
+
+def main(path: str) -> None:
+    rows = []
+    with open(path) as f:
+        for raw in csv.DictReader(f):
+            try:
+                rows.append(parse_row(raw))
+            except InvalidRowError as e:
+                print(f"Skipping row: {e}")
+
+    average = sum(r.score for r in rows) / len(rows)
+    with open("summary.txt", "w") as out:
+        out.write(f"Rows processed: {len(rows)}\\n")
+        out.write(f"Average score: {average:.2f}\\n")
+
+if __name__ == "__main__":
+    main("students.csv")` }
+          ],
           practice: ["Deliverable: README.md", "Deliverable: requirements.txt or equivalent dependency file", "Deliverable: source code", "Deliverable: tests"],
           production: [],
           diagram: flowDiagram(["Read CSV", "Validate rows", "Compute stats", "Write output file"], "--p1") }
@@ -704,6 +994,7 @@
     } else {
       if (d.diagram) html += '<section class="block">' + d.diagram + '</section>';
       if (d.topics.length) html += '<section class="block"><h3>Topics</h3><ul>' + d.topics.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
+      html += renderExamples(d.examples);
       if (d.practice.length) html += '<section class="block"><h3>Practice</h3><ul>' + d.practice.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
       if (d.production.length) html += '<section class="block"><h3>Production-Ready Notes</h3><div class="callout"><ul>' + d.production.map(t => "<li>" + t + "</li>").join("") + '</ul></div></section>';
       if (phase.qa && phase.qa.length && current.dayIdx === phase.days.length - 1) {
@@ -719,6 +1010,17 @@
       if (completed.has(n)) completed.delete(n); else completed.add(n);
       persist();
       renderAll();
+    });
+
+    detailEl.querySelectorAll(".copy-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const code = btn.closest(".example-block").querySelector("code").textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const original = btn.textContent;
+          btn.textContent = "Copied!";
+          setTimeout(() => { btn.textContent = original; }, 1400);
+        });
+      });
     });
   }
 
