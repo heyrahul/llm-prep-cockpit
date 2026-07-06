@@ -348,6 +348,21 @@
   section.block ul { margin: 0; padding-left: 20px; }
   section.block li { margin-bottom: 7px; }
 
+  .concept-list { margin: 0; }
+  .concept-list dt {
+    font-weight: 700; font-size: 14px; color: var(--text);
+    padding-left: 14px; position: relative; margin-top: 16px;
+  }
+  .concept-list dt:first-child { margin-top: 0; }
+  .concept-list dt::before {
+    content: ""; position: absolute; left: 0; top: 6px; width: 7px; height: 7px;
+    border-radius: 2px; background: var(--pc);
+  }
+  .concept-list dd {
+    margin: 5px 0 0; padding-left: 14px; color: var(--text-dim); font-size: 13.5px; line-height: 1.6;
+  }
+  .concept-list code { font-family: var(--font-mono); font-size: 12.5px; color: var(--pc); background: color-mix(in srgb, var(--pc) 12%, transparent); padding: 1px 5px; border-radius: 4px; }
+
   .callout {
     border: 1px solid var(--border); border-left: 3px solid var(--pc);
     background: var(--panel-2); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 14px;
@@ -565,7 +580,13 @@
       days: [
         { title: "Environment and Language Basics",
           why: "Before writing any code, you need a safe, repeatable place to run it — a project folder with its own installed packages, kept separate from every other project on your machine.",
-          topics: ["Install Python.", "Use venv (creates an isolated space for this project's packages, so different projects never conflict).", "Use pip (Python's package installer — similar to npm, Maven, gem, or Composer if you've used one of those).", "Understand scripts vs modules (a script you run directly; a module is code you import into other files).", "Learn indentation, dynamic typing, truthiness, exceptions, and basic data structures."],
+          topics: [
+            { t: "Install Python", x: "Your machine needs a Python interpreter to run <code>.py</code> files — nothing gets compiled into a standalone executable ahead of time; the interpreter reads and executes your code line by line. Download it from python.org, or check whether it's already installed by running <code>python --version</code> or <code>python3 --version</code> in a terminal. Aim for Python 3.11 or newer — this plan assumes Python 3, not the long-retired Python 2." },
+            { t: "Use venv", x: "Different projects often need different, conflicting versions of the same library — one might need <code>pandas 1.5</code> while another needs <code>pandas 2.1</code>. <code>venv</code> creates a private copy of Python plus a private package folder just for one project, so installing something for one project can never break another. Once activated, commands like <code>python</code> and <code>pip</code> quietly point at that isolated copy instead of your system-wide install. If you've used Node's <code>node_modules</code>, Ruby's Bundler, or any other language's per-project environment tool, this solves the exact same problem." },
+            { t: "Use pip", x: "<code>pip</code> installs packages from PyPI — the Python Package Index, the same idea as npm's registry or Maven Central — into whichever environment is currently active. You'll almost always want your <code>venv</code> active first, so packages land in the project's private folder rather than system-wide. A <code>requirements.txt</code> file lists your project's dependencies (ideally pinned to exact versions) so anyone, including future you, can recreate the same environment with <code>pip install -r requirements.txt</code>." },
+            { t: "Scripts vs. modules", x: "A <b>script</b> is a file meant to be run directly, top to bottom, with <code>python hello.py</code>. A <b>module</b> is any <code>.py</code> file whose functions and classes you import into other files with <code>import mymodule</code>. The same file can be both — which is why you'll often see <code>if __name__ == \"__main__\":</code> guarding the code that should run only when the file is executed directly, not when it's imported elsewhere." },
+            { t: "Indentation, dynamic typing, truthiness, exceptions, and data structures", x: "Python uses <b>indentation</b> (not <code>{ }</code>) to mark code blocks, so consistent spacing isn't just style — it's syntax. Variables are <b>dynamically typed</b>: a name can point to an integer today and a string tomorrow, since the type lives with the value, not the variable. In conditions, Python checks <b>truthiness</b> — empty lists, empty strings, <code>0</code>, and <code>None</code> all count as false, so <code>if not my_list:</code> is a common, idiomatic empty-check. Errors are signaled by <b>raising exceptions</b> rather than returning error codes, and you'll meet the four core structures — <code>list</code>, <code>tuple</code>, <code>dict</code>, <code>set</code> — constantly from here on." }
+          ],
           examples: [
             { label: "Your first script", code: `# hello.py
 name = input("What's your name? ")
@@ -595,7 +616,13 @@ except FileNotFoundError:
           diagram: flowDiagram(["Python interpreter", "venv (sandbox)", "pip installs packages", "your script runs"], "--p1") },
         { title: "Pythonic Syntax",
           why: "Python has compact, expressive ways to write common loop patterns. Learning them early means you can read real Python code — and interview take-homes — without getting stuck.",
-          topics: ["List, dict, and set comprehensions (a one-line way to build a new list/dict/set from another).", "Tuple unpacking.", "Slicing.", "Iteration protocols.", "enumerate, zip, any, all, sorted, map, and filter."],
+          topics: [
+            { t: "List, dict, and set comprehensions", x: "A comprehension builds a new collection from an existing one in a single, readable line: <code>[expr for item in iterable if condition]</code>. Swap the brackets for <code>{}</code> with a colon to build a dict (<code>{k: v for ...}</code>), or <code>{}</code> without a colon to build a set. They're not magic — just a more compact way to write the loop-and-append pattern you'd otherwise write across three lines." },
+            { t: "Tuple unpacking", x: "You can assign multiple variables from a sequence in one line: <code>a, b = 1, 2</code> or <code>first, *rest = [1, 2, 3, 4]</code> (the <code>*</code> grabs 'everything else' into a list). This comes up constantly — in for-loops over <code>.items()</code>, unpacking function return values, and reading rows of data." },
+            { t: "Slicing", x: "<code>sequence[start:stop:step]</code> pulls out a sub-section of a list, string, or tuple. <code>stop</code> is exclusive (never included), negative indices count from the end, and a negative step like <code>[::-1]</code> reverses the whole thing. It works identically on strings, lists, and tuples." },
+            { t: "Iteration protocols", x: "A <code>for</code> loop works on so many different types because they all follow the same protocol: something is <b>iterable</b> if it knows how to hand out an <b>iterator</b>, and an iterator knows how to produce values one at a time until it's exhausted. You don't need to implement this yourself yet — just recognize that lists, dicts, strings, and files all plug into the same <code>for item in ...</code> syntax because of it." },
+            { t: "enumerate, zip, any, all, sorted, map, and filter", x: "These small tools replace manual index-tracking and boolean loops: <code>enumerate(seq)</code> gives you <code>(index, value)</code> pairs, <code>zip(a, b)</code> pairs up two sequences element-by-element, <code>any()</code>/<code>all()</code> check a condition across a whole iterable, <code>sorted()</code> returns a new sorted list without touching the original, and <code>map()</code>/<code>filter()</code> apply a function or condition across an iterable — though a comprehension is often considered more readable for the same job." }
+          ],
           examples: [
             { label: "Comprehensions", code: `numbers = [1, 2, 3, 4, 5, 6]
 
@@ -631,7 +658,14 @@ print(rows[::2])    # [10, 30, 50]` }
           production: [] },
         { title: "Functions, Modules, and Errors",
           why: "Functions and clean error handling are what turn a script into something you'd trust in front of a real user — or an interviewer.",
-          topics: ["Function arguments.", "Default parameters.", "*args and **kwargs (let a function accept any number of extra arguments).", "Imports.", "Custom exceptions.", "Context managers with `with` (auto-closes files/connections for you, even if an error happens)."],
+          topics: [
+            { t: "Function arguments", x: "Arguments can be passed <b>positionally</b> (by order) or by <b>keyword</b> (by name, e.g. <code>greet(name=\"Sam\")</code>). Keyword arguments make call sites self-documenting and let you skip arguments that already have defaults." },
+            { t: "Default parameters", x: "A default value (<code>def f(count=1):</code>) makes an argument optional. One classic trap: never use a mutable default like <code>def f(items=[]):</code> — that empty list is created once, when the function is defined, and silently reused (and mutated) across every call. Use <code>None</code> as the default and create the list inside the function body instead." },
+            { t: "*args and **kwargs", x: "<code>*args</code> collects any extra positional arguments into a tuple; <code>**kwargs</code> collects any extra keyword arguments into a dict. They let a function accept a flexible, unknown-in-advance number of inputs — common in wrapper functions and configurable APIs." },
+            { t: "Imports", x: "<code>import module</code> brings in a whole module; <code>from module import name</code> pulls out just one thing; <code>import numpy as np</code> gives it a shorter alias. Python searches your project, installed packages, and the standard library, in that order, to resolve these." },
+            { t: "Custom exceptions", x: "Subclassing <code>Exception</code> (e.g. <code>class InvalidRowError(Exception): pass</code>) lets you signal a specific, meaningful failure instead of a generic one. This makes your <code>except</code> blocks precise — you catch exactly the failure you expect instead of accidentally swallowing unrelated bugs with a bare <code>except Exception</code>." },
+            { t: "Context managers with with", x: "A context manager guarantees cleanup code runs, even if an error occurs partway through. <code>with open(path) as f:</code> is the classic example — the file closes automatically the moment the block ends, for any reason. The same pattern shows up for database connections, locks, and temporary state changes." }
+          ],
           examples: [
             { label: "Default args and *args / **kwargs", code: `def greet(name, greeting="Hello"):
     return f"{greeting}, {name}!"
@@ -666,7 +700,13 @@ except InvalidRowError as e:
           production: [] },
         { title: "Object-Oriented Python",
           why: "It's tempting to reach for classes for everything, especially if your background involved a lot of object-oriented design. Python rewards restraint — this is where you learn when a class actually earns its place.",
-          topics: ["Classes.", "Dataclasses (classes that auto-generate boilerplate like constructors and equality checks).", "Properties.", "Class methods and static methods.", "Composition over inheritance."],
+          topics: [
+            { t: "Classes", x: "A class bundles data and behavior together. <code>__init__</code> runs when you create an instance and sets up its starting state; <code>self</code> inside a method always refers to that particular instance, so <code>self.name</code> is this object's own name, distinct from every other instance." },
+            { t: "Dataclasses", x: "<code>@dataclass</code> generates the boring parts of a class for you — a constructor, a readable <code>__repr__</code>, and equality comparison — from a short list of typed fields. It's a good default for classes that are mostly structured data with maybe a method or two." },
+            { t: "Properties", x: "<code>@property</code> lets a method be accessed like a plain attribute (<code>student.score</code> instead of <code>student.score()</code>), and its paired <code>@score.setter</code> lets you validate or transform a value on assignment. You can start with a plain public attribute and add validation later without breaking anyone's existing code." },
+            { t: "Class methods and static methods", x: "A <code>@classmethod</code> receives the class itself (<code>cls</code>) instead of an instance — useful for alternate constructors like <code>Student.from_csv_row(...)</code>. A <code>@staticmethod</code> receives neither <code>self</code> nor <code>cls</code> — it's really just a plain function that happens to live in the class's namespace because it's conceptually related." },
+            { t: "Composition over inheritance", x: "Instead of building deep chains of subclasses ('a Dog <i>is an</i> Animal'), it's often more flexible to have one object hold a reference to another and delegate to it ('a Car <i>has an</i> Engine'). Composition avoids the fragility of inheritance hierarchies that get harder to change the deeper they go." }
+          ],
           examples: [
             { label: "A plain class vs. a dataclass", code: `class StudentPlain:
     def __init__(self, name, score):
@@ -721,7 +761,13 @@ print(Student.passing(s.score))   # True` }
           production: [] },
         { title: "Type Hints and Tooling",
           why: "Type hints and linters give you a safety net similar to what a compiler checks in statically-typed languages — except here it's opt-in, and checked by a separate tool rather than the language itself.",
-          topics: ["Type hints.", "Optional, Union, Literal, TypedDict, and generics (ways to describe more precise shapes of data).", "mypy or pyright (type checkers that read your hints and flag mismatches).", "Formatting with black or ruff format.", "Linting with ruff."],
+          topics: [
+            { t: "Type hints", x: "<code>def f(x: int) -> str:</code> documents what a function expects and returns. They're read by humans and by tools — Python itself does not check them while your code is running, which is what the next two tools are for." },
+            { t: "Optional, Union, Literal, TypedDict, and generics", x: "<code>Optional[X]</code> means 'an X, or None'. <code>Union[A, B]</code> means 'an A or a B'. <code>Literal[\"train\", \"eval\"]</code> restricts a value to an exact, fixed set of options — a lightweight enum. <code>TypedDict</code> describes a dict with a known, fixed set of keys and their types. Generics like <code>list[int]</code> describe not just the container, but what's inside it." },
+            { t: "mypy or pyright", x: "These type checkers read your type hints and flag mismatches — like passing a string where a function expects an int — before you ever run the code. Run them locally or wire them into CI so type errors are caught early, not in production." },
+            { t: "Formatting with black or ruff format", x: "An auto-formatter rewrites your code into one consistent style automatically, so nobody argues about spacing or line breaks in code review — it just runs before every commit." },
+            { t: "Linting with ruff", x: "A linter catches real problems beyond style — unused imports, undefined variables, unreachable code — by analyzing your code without running it." }
+          ],
           examples: [
             { label: "Type hints in practice", code: `from typing import Optional, Union, Literal, TypedDict
 
@@ -747,7 +793,13 @@ ruff check .          # lint for style and common bugs` }
           production: ["Use type hints for public functions and service boundaries.", "Use formatting and linting from day one.", "Keep code style automated."] },
         { title: "Testing Basics",
           why: "Untested code is a rumor. Tests are how you prove your code does what you think it does — and keep proving it after you change something.",
-          topics: ["pytest.", "Unit tests.", "Fixtures (reusable setup for tests).", "Parametrized tests (run the same test with many different inputs).", "Temporary files in tests."],
+          topics: [
+            { t: "pytest", x: "pytest automatically discovers files named <code>test_*.py</code> and functions named <code>test_*</code> inside them, then runs each as an independent test. A plain <code>assert</code> statement is enough — pytest rewrites it under the hood to give you a detailed failure message, no special assertion methods required." },
+            { t: "Unit tests", x: "A unit test checks the smallest meaningful piece of behavior — usually a single function — in isolation, with no real network calls, databases, or file systems involved. Fast and focused, so a failure points at exactly what broke." },
+            { t: "Fixtures", x: "A fixture is reusable setup (and optional teardown) that a test asks for simply by naming it as a parameter. pytest matches the parameter name to a function decorated with <code>@pytest.fixture</code> and injects the result automatically." },
+            { t: "Parametrized tests", x: "<code>@pytest.mark.parametrize</code> runs the same test function once per input/expected-output pair you supply, instead of copy-pasting near-identical tests for every case." },
+            { t: "Temporary files in tests", x: "Tests that need a real file on disk should use pytest's built-in <code>tmp_path</code> fixture — a throwaway directory created fresh for each test and cleaned up automatically, so tests never depend on, or pollute, your real filesystem." }
+          ],
           examples: [
             { label: "Your first pytest test", code: `# test_stats.py
 from stats import average
@@ -778,7 +830,9 @@ def test_parse_score(value, expected):
           production: ["Tests should cover behavior, not implementation details.", "Keep small pure functions easy to test."] },
         { title: "Mini Project",
           why: "This is where Days 1-6 come together into one small, real program — the first thing in your portfolio that isn't a toy exercise.",
-          topics: ["Build: a tested Python CLI that reads a CSV file, validates rows, computes summary statistics, and writes a clean output file."],
+          topics: [
+            { t: "Build: a tested Python CLI that reads a CSV file, validates rows, computes summary statistics, and writes a clean output file", x: "This single project deliberately reuses everything from this week: a <code>dataclass</code> to model a row, a custom exception to reject bad rows without crashing the whole run, a <code>with</code> block to handle files safely, type hints on every function signature, and a test file that proves it all actually works. It's small, but it's the first thing here that looks like real, production-shaped code rather than a syntax exercise." }
+          ],
           examples: [
             { label: "Putting it all together: cli.py", code: `import csv
 from dataclasses import dataclass
@@ -950,7 +1004,7 @@ if __name__ == "__main__":
       let anyVisible = false;
       phase.days.forEach((d, dIdx) => {
         const n = globalDayNumber(pIdx, dIdx);
-        const matches = !q || d.title.toLowerCase().includes(q) || d.topics.some(t => t.toLowerCase().includes(q));
+        const matches = !q || d.title.toLowerCase().includes(q) || d.topics.some(c => (typeof c === "string" ? c : c.t).toLowerCase().includes(q));
         if (matches) anyVisible = true;
 
         const chip = document.createElement("button");
@@ -993,7 +1047,9 @@ if __name__ == "__main__":
       html += '<div class="pending-card"><strong>Content pending.</strong> This day’s topics, practice, and notes will appear here once the full syllabus is merged into the template.</div>';
     } else {
       if (d.diagram) html += '<section class="block">' + d.diagram + '</section>';
-      if (d.topics.length) html += '<section class="block"><h3>Topics</h3><ul>' + d.topics.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
+      if (d.topics.length) html += '<section class="block"><h3>Concepts</h3><dl class="concept-list">' +
+        d.topics.map(c => typeof c === "string" ? "<dt>" + c + "</dt>" : "<dt>" + c.t + "</dt><dd>" + c.x + "</dd>").join("") +
+        '</dl></section>';
       html += renderExamples(d.examples);
       if (d.practice.length) html += '<section class="block"><h3>Practice</h3><ul>' + d.practice.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
       if (d.production.length) html += '<section class="block"><h3>Production-Ready Notes</h3><div class="callout"><ul>' + d.production.map(t => "<li>" + t + "</li>").join("") + '</ul></div></section>';
