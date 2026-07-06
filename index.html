@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>60-Day AI/ML Study Deck</title>
+<style>
+  :root {
+    --bg: #0d1013;
+    --panel: #151a1e;
+    --panel-2: #1c2328;
+    --border: #2a333a;
+    --text: #e7ebec;
+    --text-dim: #8a97a0;
+    --accent: #e39a3b;
+    --accent-soft: rgba(227, 154, 59, 0.16);
+    --good: #4fa98c;
+    --good-soft: rgba(79, 169, 140, 0.16);
+    --warn: #d96b4a;
+    --focus: #5cc2d9;
+
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "IBM Plex Sans", Roboto, Helvetica, Arial, sans-serif;
+
+    --radius: 6px;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f1f3f4;
+    --panel: #ffffff;
+    --panel-2: #f7f8f7;
+    --border: #d7dcdf;
+    --text: #1b2226;
+    --text-dim: #5b6870;
+    --accent: #b96a16;
+    --accent-soft: rgba(185, 106, 22, 0.12);
+    --good: #2f7f68;
+    --good-soft: rgba(47, 127, 104, 0.12);
+    --warn: #b14b30;
+    --focus: #1e93ac;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f1f3f4;
+      --panel: #ffffff;
+      --panel-2: #f7f8f7;
+      --border: #d7dcdf;
+      --text: #1b2226;
+      --text-dim: #5b6870;
+      --accent: #b96a16;
+      --accent-soft: rgba(185, 106, 22, 0.12);
+      --good: #2f7f68;
+      --good-soft: rgba(47, 127, 104, 0.12);
+      --warn: #b14b30;
+      --focus: #1e93ac;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  button { font-family: inherit; }
+
+  ::selection { background: var(--accent-soft); }
+
+  .app {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    min-height: 100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .brand .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .brand h1 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .stat-strip {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-family: var(--font-mono);
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+  }
+  .stat .num {
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .stat .label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .stat .num.good { color: var(--good); }
+  .stat .num.accent { color: var(--accent); }
+
+  .theme-toggle {
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text-dim);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--text-dim); }
+
+  /* ---------- Day map strip ---------- */
+  .daymap {
+    display: flex;
+    gap: 10px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    overflow-x: auto;
+  }
+  .daymap-group {
+    display: flex;
+    gap: 3px;
+    padding-right: 10px;
+    border-right: 1px solid var(--border);
+  }
+  .daymap-group:last-child { border-right: none; }
+  .daymap-cell {
+    width: 9px;
+    height: 18px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    cursor: pointer;
+    padding: 0;
+    flex: none;
+  }
+  .daymap-cell:hover { border-color: var(--text-dim); }
+  .daymap-cell.done { background: var(--good); border-color: var(--good); }
+  .daymap-cell.pending { opacity: 0.35; }
+  .daymap-cell.current { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .daymap-cell:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+  /* ---------- Body grid ---------- */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 0;
+  }
+
+  /* ---------- Sidebar ---------- */
+  nav.sidebar {
+    border-right: 1px solid var(--border);
+    background: var(--panel);
+    overflow-y: auto;
+    padding: 14px;
+  }
+  .search-box {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  .search-box:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .search-box::placeholder { color: var(--text-dim); }
+
+  details.phase {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    background: var(--panel-2);
+    overflow: hidden;
+  }
+  details.phase[open] { border-color: var(--border); }
+  details.phase > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  details.phase > summary::-webkit-details-marker { display: none; }
+  .phase-title {
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .phase-range {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+  .phase-progress-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 12px 10px;
+  }
+  .phase-progress-fill {
+    height: 100%;
+    background: var(--good);
+  }
+
+  .day-list { padding: 0 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .day-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    color: var(--text);
+    padding: 6px 8px;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .day-chip:hover { background: var(--panel); }
+  .day-chip.current {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .day-chip:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .day-chip .n {
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    font-size: 11px;
+    width: 22px;
+    flex: none;
+  }
+  .day-chip.done .n { color: var(--good); }
+  .day-chip .t {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .day-chip .check {
+    width: 13px;
+    height: 13px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    flex: none;
+  }
+  .day-chip.done .check {
+    background: var(--good);
+    border-color: var(--good);
+    position: relative;
+  }
+  .day-chip.done .check::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 4px;
+    height: 7px;
+    border-right: 1.5px solid var(--panel);
+    border-bottom: 1.5px solid var(--panel);
+    transform: rotate(45deg);
+  }
+  .day-chip.pending { opacity: 0.45; }
+  .day-chip[hidden] { display: none; }
+
+  /* ---------- Main panel ---------- */
+  main.detail {
+    padding: 28px 36px;
+    overflow-y: auto;
+    max-width: 760px;
+  }
+  .detail-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .detail-eyebrow .accent { color: var(--accent); }
+  h2.detail-title {
+    font-size: 27px;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .phase-goal {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin: 0 0 22px;
+    max-width: 62ch;
+  }
+
+  .complete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--good);
+    background: transparent;
+    color: var(--good);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 26px;
+  }
+  .complete-btn:hover { background: var(--good-soft); }
+  .complete-btn.is-done { background: var(--good); color: var(--panel); }
+  .complete-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  section.block { margin-bottom: 24px; }
+  section.block h3 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  section.block ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+  section.block li { margin-bottom: 6px; }
+
+  .callout {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    background: var(--panel-2);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 14px;
+  }
+  .callout ul { padding-left: 18px; margin: 0; }
+
+  details.qa {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+  details.qa summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    list-style: none;
+  }
+  details.qa summary::-webkit-details-marker { display: none; }
+  details.qa summary::before {
+    content: "Q · ";
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+  details.qa p {
+    margin: 8px 0 0;
+    color: var(--text-dim);
+    font-size: 13.5px;
+  }
+
+  .pending-card {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    color: var(--text-dim);
+    font-size: 13.5px;
+  }
+  .pending-card strong { color: var(--text); }
+
+  @media (max-width: 820px) {
+    .body-grid { grid-template-columns: 1fr; }
+    nav.sidebar { max-height: 40vh; }
+    main.detail { padding: 20px; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .phase-progress-fill, .complete-btn { transition: all 0.15s ease; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="eyebrow">Flight Deck</span>
+      <h1>60-Day AI/ML Study Deck</h1>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><span class="num good" id="stat-done">0/60</span><span class="label">Days Done</span></div>
+      <div class="stat"><span class="num accent" id="stat-pct">0%</span><span class="label">Progress</span></div>
+      <div class="stat"><span class="num" id="stat-phase">Phase 1</span><span class="label">Current Phase</span></div>
+      <button class="theme-toggle" id="theme-toggle" type="button">Toggle theme</button>
+    </div>
+  </header>
+
+  <div class="daymap" id="daymap" aria-label="60-day progress map"></div>
+
+  <div class="body-grid">
+    <nav class="sidebar" id="sidebar">
+      <input class="search-box" id="search" type="search" placeholder="Search topics, days…" aria-label="Search syllabus" />
+      <div id="phase-list"></div>
+    </nav>
+    <main class="detail" id="detail"></main>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- Data ----------
+  // Phase 1 is fully populated from the syllabus as a working sample.
+  // Phases 2-8 carry real day titles/goals; bodies are marked "pending"
+  // until the full syllabus is merged in.
+  const PHASES = [
+    {
+      id: 1, range: "Days 1-7", title: "Python Foundations for Java Developers",
+      goal: "Learn Python syntax, runtime behavior, packaging basics, and idiomatic style.",
+      qa: [
+        ["Should I use venv, conda, or Docker?", "Use venv for normal Python app development, conda when scientific packages or GPU dependencies are easier that way, and Docker when you need reproducible deployment."],
+        ["Is Python pass-by-value or pass-by-reference?", "Python passes object references by assignment. Mutable objects can be changed inside a function; rebinding a parameter does not change the caller's variable."],
+        ["Should Java developers use classes everywhere in Python?", "No. Prefer functions and small modules until state or behavior grouping clearly needs a class."],
+        ["Are type hints enforced at runtime?", "No. Type hints help tools and humans. Runtime validation requires explicit checks or libraries."],
+        ["What should I test first?", "Test parsing, validation, data transformations, and business logic. Avoid over-testing print statements and trivial wrappers."]
+      ],
+      days: [
+        { title: "Environment and Language Basics",
+          topics: ["Install Python.", "Use venv.", "Use pip.", "Understand scripts vs modules.", "Learn indentation, dynamic typing, truthiness, exceptions, and basic data structures."],
+          practice: ["Create a small CLI script that reads a file and prints word counts.", "Create and activate a virtual environment.", "Install one dependency and freeze dependencies."],
+          production: ["Keep dependencies isolated per project.", "Never rely on global Python packages.", "Use .gitignore for virtual environments, cache files, and local data."] },
+        { title: "Pythonic Syntax",
+          topics: ["List, dict, and set comprehensions.", "Tuple unpacking.", "Slicing.", "Iteration protocols.", "enumerate, zip, any, all, sorted, map, and filter."],
+          practice: ["Rewrite Java-style loops into idiomatic Python.", "Parse a CSV-like text file without Pandas."],
+          production: [] },
+        { title: "Functions, Modules, and Errors",
+          topics: ["Function arguments.", "Default parameters.", "*args and **kwargs.", "Imports.", "Custom exceptions.", "Context managers with with."],
+          practice: ["Build reusable utility functions for file parsing.", "Add error handling for missing files and invalid input."],
+          production: [] },
+        { title: "Object-Oriented Python",
+          topics: ["Classes.", "Dataclasses.", "Properties.", "Class methods and static methods.", "Composition over inheritance."],
+          practice: ["Model a simple dataset record with dataclass.", "Add validation logic."],
+          production: [] },
+        { title: "Type Hints and Tooling",
+          topics: ["Type hints.", "Optional, Union, Literal, TypedDict, and generics.", "mypy or pyright.", "Formatting with black or ruff format.", "Linting with ruff."],
+          practice: ["Add type hints to previous scripts.", "Run a formatter and linter."],
+          production: ["Use type hints for public functions and service boundaries.", "Use formatting and linting from day one.", "Keep code style automated."] },
+        { title: "Testing Basics",
+          topics: ["pytest.", "Unit tests.", "Fixtures.", "Parametrized tests.", "Temporary files in tests."],
+          practice: ["Add tests for the CLI/file parser.", "Test both success and failure cases."],
+          production: ["Tests should cover behavior, not implementation details.", "Keep small pure functions easy to test."] },
+        { title: "Mini Project",
+          topics: ["Build: a tested Python CLI that reads a CSV file, validates rows, computes summary statistics, and writes a clean output file."],
+          practice: ["Deliverable: README.md", "Deliverable: requirements.txt or equivalent dependency file", "Deliverable: source code", "Deliverable: tests"],
+          production: [] }
+      ]
+    },
+    { id: 2, range: "Days 8-14", title: "NumPy, Pandas, and Data Analysis",
+      goal: "Learn the data manipulation foundation used across ML work.",
+      qa: [], days: dayTitles(["NumPy Arrays","Broadcasting and Matrix Operations","Pandas Basics","Pandas Data Cleaning","Grouping, Joining, and Reshaping","Visualization and EDA","Data Analysis Mini Project"]) },
+    { id: 3, range: "Days 15-18", title: "Math for ML Without Getting Lost",
+      goal: "Learn enough math to understand model behavior, debugging, and interviews.",
+      qa: [], days: dayTitles(["Linear Algebra","Calculus and Optimization","Probability and Statistics","ML Problem Framing"]) },
+    { id: 4, range: "Days 19-28", title: "Classical Machine Learning",
+      goal: "Build reliable models with Scikit-Learn and understand evaluation.",
+      qa: [], days: dayTitles(["Scikit-Learn Workflow","Regression","Classification","Feature Engineering","Model Evaluation","Hyperparameter Tuning","Unsupervised Learning","Classical ML Project","Classical ML Project","Classical ML Project"]) },
+    { id: 5, range: "Days 29-38", title: "Deep Learning with PyTorch",
+      goal: "Understand neural network fundamentals and build models without hiding the training loop.",
+      qa: [], days: dayTitles(["PyTorch Tensors","Autograd","Neural Network Basics","Training Loop","Regularization","CNNs","Sequence Models","Deep Learning Project","Deep Learning Project","Deep Learning Project"]) },
+    { id: 6, range: "Days 39-45", title: "Transformers, LLMs, and GenAI Foundations",
+      goal: "Understand modern AI application building blocks.",
+      qa: [], days: dayTitles(["Transformer Architecture","LLM Basics","Prompting","Embeddings and Vector Search","RAG","GenAI Evaluation","GenAI Mini Project"]) },
+    { id: 7, range: "Days 46-55", title: "Production-Ready AI/ML Engineering",
+      goal: "Learn the practices needed to move from notebooks to reliable services.",
+      qa: [], days: dayTitles(["Project Structure and Config","APIs for ML and GenAI","Model Serialization and Inference","Containers","Observability","Data and Model Versioning","CI/CD and Quality Gates","Security and Governance","Deployment Patterns","Production Readiness Review"]) },
+    { id: 8, range: "Days 56-60", title: "Capstone and Interview Launch",
+      goal: "Prove skill through one polished project and interview-ready explanations.",
+      qa: [], days: dayTitles(["Capstone Architecture","Implementation","Production Hardening","Interview Prep","Portfolio Polish"]) }
+  ];
+
+  function dayTitles(titles) {
+    return titles.map(t => ({ title: t, topics: [], practice: [], production: [], pending: true }));
+  }
+
+  // flat index of all days across phases, with global day number
+  const FLAT = [];
+  (function buildFlat() {
+    let n = 1;
+    PHASES.forEach((phase, pIdx) => {
+      phase.days.forEach((d, dIdx) => {
+        FLAT.push({ day: n, phaseIdx: pIdx, dayIdx: dIdx });
+        n++;
+      });
+    });
+  })();
+
+  // ---------- State ----------
+  const STORAGE_KEY = "study-deck-progress-v1";
+  let completed = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+  let current = { phaseIdx: 0, dayIdx: 0 };
+
+  function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...completed]));
+  }
+
+  function globalDayNumber(phaseIdx, dayIdx) {
+    return FLAT.find(f => f.phaseIdx === phaseIdx && f.dayIdx === dayIdx).day;
+  }
+
+  // ---------- Rendering ----------
+  const daymapEl = document.getElementById("daymap");
+  const phaseListEl = document.getElementById("phase-list");
+  const detailEl = document.getElementById("detail");
+  const searchEl = document.getElementById("search");
+
+  function renderDaymap() {
+    daymapEl.innerHTML = "";
+    PHASES.forEach((phase, pIdx) => {
+      const group = document.createElement("div");
+      group.className = "daymap-group";
+      phase.days.forEach((d, dIdx) => {
+        const n = globalDayNumber(pIdx, dIdx);
+        const cell = document.createElement("button");
+        cell.className = "daymap-cell";
+        cell.type = "button";
+        cell.title = "Day " + n + ": " + d.title;
+        cell.setAttribute("aria-label", "Day " + n + ": " + d.title);
+        if (completed.has(n)) cell.classList.add("done");
+        if (d.pending) cell.classList.add("pending");
+        if (pIdx === current.phaseIdx && dIdx === current.dayIdx) cell.classList.add("current");
+        cell.addEventListener("click", () => selectDay(pIdx, dIdx));
+        group.appendChild(cell);
+      });
+      daymapEl.appendChild(group);
+    });
+  }
+
+  function renderSidebar(filter) {
+    phaseListEl.innerHTML = "";
+    const q = (filter || "").trim().toLowerCase();
+
+    PHASES.forEach((phase, pIdx) => {
+      const doneInPhase = phase.days.filter((d, dIdx) => completed.has(globalDayNumber(pIdx, dIdx))).length;
+      const pct = Math.round((doneInPhase / phase.days.length) * 100);
+
+      const details = document.createElement("details");
+      details.className = "phase";
+      if (pIdx === current.phaseIdx || q) details.open = true;
+
+      const summary = document.createElement("summary");
+      summary.innerHTML =
+        '<span><span class="phase-title">Phase ' + phase.id + ' · ' + phase.title + '</span></span>' +
+        '<span class="phase-range">' + phase.range + '</span>';
+      details.appendChild(summary);
+
+      const track = document.createElement("div");
+      track.className = "phase-progress-track";
+      const fill = document.createElement("div");
+      fill.className = "phase-progress-fill";
+      fill.style.width = pct + "%";
+      track.appendChild(fill);
+      details.appendChild(track);
+
+      const list = document.createElement("div");
+      list.className = "day-list";
+
+      let anyVisible = false;
+      phase.days.forEach((d, dIdx) => {
+        const n = globalDayNumber(pIdx, dIdx);
+        const matches = !q || d.title.toLowerCase().includes(q) ||
+          d.topics.some(t => t.toLowerCase().includes(q));
+        if (matches) anyVisible = true;
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "day-chip";
+        if (completed.has(n)) chip.classList.add("done");
+        if (d.pending) chip.classList.add("pending");
+        if (pIdx === current.phaseIdx && dIdx === current.dayIdx) chip.classList.add("current");
+        if (!matches) chip.hidden = true;
+        chip.setAttribute("aria-current", pIdx === current.phaseIdx && dIdx === current.dayIdx ? "true" : "false");
+        chip.innerHTML =
+          '<span class="n">D' + n + '</span>' +
+          '<span class="t">' + d.title + '</span>' +
+          '<span class="check" aria-hidden="true"></span>';
+        chip.addEventListener("click", () => selectDay(pIdx, dIdx));
+        list.appendChild(chip);
+      });
+
+      if (q && !anyVisible) details.style.display = "none";
+
+      details.appendChild(list);
+      phaseListEl.appendChild(details);
+    });
+  }
+
+  function renderDetail() {
+    const phase = PHASES[current.phaseIdx];
+    const d = phase.days[current.dayIdx];
+    const n = globalDayNumber(current.phaseIdx, current.dayIdx);
+    const isDone = completed.has(n);
+
+    let html = "";
+    html += '<div class="detail-eyebrow">Phase ' + phase.id + ' <span class="accent">·</span> Day ' + n + ' of 60</div>';
+    html += '<h2 class="detail-title">' + d.title + '</h2>';
+    html += '<p class="phase-goal">' + phase.goal + '</p>';
+    html += '<button class="complete-btn' + (isDone ? " is-done" : "") + '" id="complete-toggle" type="button">' +
+      (isDone ? "✓ Marked complete" : "Mark day complete") + '</button>';
+
+    if (d.pending) {
+      html += '<div class="pending-card"><strong>Content pending.</strong> This day’s topics, practice, and notes will appear here once the full syllabus is merged into the template.</div>';
+    } else {
+      if (d.topics.length) {
+        html += '<section class="block"><h3>Topics</h3><ul>' +
+          d.topics.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
+      }
+      if (d.practice.length) {
+        html += '<section class="block"><h3>Practice</h3><ul>' +
+          d.practice.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
+      }
+      if (d.production.length) {
+        html += '<section class="block"><h3>Production-Ready Notes</h3><div class="callout"><ul>' +
+          d.production.map(t => "<li>" + t + "</li>").join("") + '</ul></div></section>';
+      }
+      if (phase.qa && phase.qa.length && current.dayIdx === phase.days.length - 1) {
+        html += '<section class="block"><h3>Most Asked / Most Confused Q&A</h3>';
+        phase.qa.forEach(([q, a]) => {
+          html += '<details class="qa"><summary>' + q + '</summary><p>' + a + '</p></details>';
+        });
+        html += '</section>';
+      }
+    }
+
+    detailEl.innerHTML = html;
+
+    document.getElementById("complete-toggle").addEventListener("click", () => {
+      if (completed.has(n)) completed.delete(n); else completed.add(n);
+      persist();
+      renderAll();
+    });
+  }
+
+  function renderStats() {
+    const total = FLAT.length;
+    const done = completed.size;
+    document.getElementById("stat-done").textContent = done + "/" + total;
+    document.getElementById("stat-pct").textContent = Math.round((done / total) * 100) + "%";
+    document.getElementById("stat-phase").textContent = "Phase " + PHASES[current.phaseIdx].id;
+  }
+
+  function renderAll() {
+    renderDaymap();
+    renderSidebar(searchEl.value);
+    renderDetail();
+    renderStats();
+  }
+
+  function selectDay(phaseIdx, dayIdx) {
+    current = { phaseIdx, dayIdx };
+    renderAll();
+    detailEl.scrollTop = 0;
+  }
+
+  searchEl.addEventListener("input", () => renderSidebar(searchEl.value));
+
+  // ---------- Theme toggle ----------
+  const themeToggle = document.getElementById("theme-toggle");
+  themeToggle.addEventListener("click", () => {
+    const root = document.documentElement;
+    const cur = root.getAttribute("data-theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const effectiveIsDark = cur ? cur === "dark" : prefersDark;
+    root.setAttribute("data-theme", effectiveIsDark ? "light" : "dark");
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
