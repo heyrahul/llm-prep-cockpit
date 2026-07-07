@@ -659,6 +659,7 @@ print(rows[::2])    # [10, 30, 50]` }
         { title: "Functions, Modules, and Errors",
           why: "Functions and clean error handling are what turn a script into something you'd trust in front of a real user — or an interviewer.",
           topics: [
+            { t: "Defining a function with def", x: "You create a function with the <code>def</code> keyword, a name, and parentheses holding whatever inputs it needs: <code>def add(a, b):</code> followed by an indented body. <code>return</code> sends a value back to whoever called the function and immediately ends it — a function with no <code>return</code> statement just gives back <code>None</code>. You then run it by calling its name with parentheses, e.g. <code>add(2, 3)</code>, the same way you'd call <code>print(...)</code> or <code>len(...)</code>." },
             { t: "Function arguments", x: "Arguments can be passed <b>positionally</b> (by order) or by <b>keyword</b> (by name, e.g. <code>greet(name=\"Sam\")</code>). Keyword arguments make call sites self-documenting and let you skip arguments that already have defaults." },
             { t: "Default parameters", x: "A default value (<code>def f(count=1):</code>) makes an argument optional. One classic trap: never use a mutable default like <code>def f(items=[]):</code> — that empty list is created once, when the function is defined, and silently reused (and mutated) across every call. Use <code>None</code> as the default and create the list inside the function body instead." },
             { t: "*args and **kwargs", x: "<code>*args</code> collects any extra positional arguments into a tuple; <code>**kwargs</code> collects any extra keyword arguments into a dict. They let a function accept a flexible, unknown-in-advance number of inputs — common in wrapper functions and configurable APIs." },
@@ -667,6 +668,15 @@ print(rows[::2])    # [10, 30, 50]` }
             { t: "Context managers with with", x: "A context manager guarantees cleanup code runs, even if an error occurs partway through. <code>with open(path) as f:</code> is the classic example — the file closes automatically the moment the block ends, for any reason. The same pattern shows up for database connections, locks, and temporary state changes." }
           ],
           examples: [
+            { label: "Defining and calling a function", code: `def add(a, b):
+    return a + b
+
+def shout(message):
+    print(message.upper())
+    # no return statement here — calling shout() gives back None
+
+result = add(2, 3)   # result now holds 5
+shout("hello")        # prints: HELLO` },
             { label: "Default args and *args / **kwargs", code: `def greet(name, greeting="Hello"):
     return f"{greeting}, {name}!"
 
