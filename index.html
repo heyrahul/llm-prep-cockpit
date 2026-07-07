@@ -31,6 +31,8 @@
     --focus: #6fd8e8;
     --good: #35c98f;
     --good-soft: rgba(53, 201, 143, 0.16);
+    --warn: #ff9142;
+    --warn-soft: rgba(255, 145, 66, 0.14);
 
     --p1: #5b8def; /* Python Foundations */
     --p2: #22c3d6; /* NumPy / Pandas */
@@ -59,6 +61,8 @@
     --focus: #0e8fa3;
     --good: #1c9166;
     --good-soft: rgba(28, 145, 102, 0.12);
+    --warn: #b5540f;
+    --warn-soft: rgba(181, 84, 15, 0.1);
 
     --p1: #3563d1;
     --p2: #0f8c9c;
@@ -82,6 +86,8 @@
       --focus: #0e8fa3;
       --good: #1c9166;
       --good-soft: rgba(28, 145, 102, 0.12);
+      --warn: #b5540f;
+      --warn-soft: rgba(181, 84, 15, 0.1);
 
       --p1: #3563d1;
       --p2: #0f8c9c;
@@ -418,6 +424,31 @@
   .pending-card { border: 1px dashed var(--border); border-radius: var(--radius); padding: 22px; color: var(--text-dim); font-size: 13.5px; background: var(--panel); }
   .pending-card strong { color: var(--text); }
 
+  .mistakes-callout {
+    display: flex; gap: 10px; align-items: flex-start;
+    border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border));
+    background: var(--warn-soft);
+    border-radius: var(--radius); padding: 13px 15px;
+  }
+  .mistakes-icon { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--warn); }
+  .mistakes-callout ul { margin: 0; padding-left: 18px; }
+  .mistakes-callout li { margin-bottom: 6px; font-size: 13.5px; color: var(--text); }
+  .mistakes-callout li:last-child { margin-bottom: 0; }
+  .mistakes-callout code { font-family: var(--font-mono); font-size: 12.5px; color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); padding: 1px 5px; border-radius: 4px; }
+
+  .practice-item { margin-bottom: 10px; }
+  details.solution {
+    margin: 6px 0 0 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  details.solution summary {
+    cursor: pointer; list-style: none; font-size: 12px; font-weight: 700; color: var(--pc);
+    padding: 7px 12px; background: color-mix(in srgb, var(--pc) 8%, transparent);
+  }
+  details.solution summary::-webkit-details-marker { display: none; }
+  details.solution summary::before { content: "▸ "; }
+  details.solution[open] summary::before { content: "▾ "; }
+  details.solution .example-block { border: none; border-radius: 0; margin: 0; }
+
   @media (max-width: 900px) {
     .hamburger { display: inline-flex; }
     .stat-strip { gap: 14px; }
@@ -523,22 +554,43 @@
     });
   }
 
+  function renderCodeBlock(label, lang, code) {
+    const isPy = !lang || lang === "python";
+    const highlighted = isPy ? highlightPython(code) : esc(code);
+    return '<div class="example-block">' +
+      '<div class="example-head"><span class="example-label">' + esc(label) + '</span>' +
+      '<span style="display:flex;align-items:center;gap:8px">' +
+      '<span class="example-lang">' + (lang || "python") + '</span>' +
+      '<button type="button" class="copy-btn">Copy</button></span></div>' +
+      '<pre class="code-block"><code>' + highlighted + '</code></pre>' +
+      '</div>';
+  }
+
   function renderExamples(examples) {
     if (!examples || !examples.length) return "";
     let html = '<section class="block"><h3>Examples</h3>';
-    examples.forEach((ex, i) => {
-      const isPy = !ex.lang || ex.lang === "python";
-      const highlighted = isPy ? highlightPython(ex.code) : esc(ex.code);
-      html += '<div class="example-block">' +
-        '<div class="example-head"><span class="example-label">' + esc(ex.label) + '</span>' +
-        '<span style="display:flex;align-items:center;gap:8px">' +
-        '<span class="example-lang">' + (ex.lang || "python") + '</span>' +
-        '<button type="button" class="copy-btn" data-copy-idx="' + i + '">Copy</button></span></div>' +
-        '<pre class="code-block"><code>' + highlighted + '</code></pre>' +
-        '</div>';
-    });
+    examples.forEach(ex => { html += renderCodeBlock(ex.label, ex.lang, ex.code); });
     html += '</section>';
     return html;
+  }
+
+  function renderMistakes(mistakes) {
+    if (!mistakes || !mistakes.length) return "";
+    return '<section class="block"><h3>Common Mistakes</h3><div class="mistakes-callout">' +
+      '<svg class="mistakes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>' +
+      '<ul>' + mistakes.map(m => "<li>" + m + "</li>").join("") + '</ul></div></section>';
+  }
+
+  function renderPractice(practice) {
+    if (!practice || !practice.length) return "";
+    const items = practice.map(p => {
+      if (typeof p === "string") return "<li class=\"practice-item\"><span class=\"ptext\">" + p + "</span></li>";
+      const solutionHtml = p.solution
+        ? '<details class="solution"><summary>Show a possible solution</summary>' + renderCodeBlock("Solution", p.lang, p.solution) + '</details>'
+        : "";
+      return '<li class="practice-item"><span class="ptext">' + p.task + '</span>' + solutionHtml + '</li>';
+    }).join("");
+    return '<section class="block"><h3>Practice</h3><ul>' + items + '</ul></section>';
   }
 
   function flowDiagram(steps, phaseVar) {
@@ -585,12 +637,29 @@
             { t: "Use venv", x: "Different projects often need different, conflicting versions of the same library — one might need <code>pandas 1.5</code> while another needs <code>pandas 2.1</code>. <code>venv</code> creates a private copy of Python plus a private package folder just for one project, so installing something for one project can never break another. Once activated, commands like <code>python</code> and <code>pip</code> quietly point at that isolated copy instead of your system-wide install. If you've used Node's <code>node_modules</code>, Ruby's Bundler, or any other language's per-project environment tool, this solves the exact same problem." },
             { t: "Use pip", x: "<code>pip</code> installs packages from PyPI — the Python Package Index, the same idea as npm's registry or Maven Central — into whichever environment is currently active. You'll almost always want your <code>venv</code> active first, so packages land in the project's private folder rather than system-wide. A <code>requirements.txt</code> file lists your project's dependencies (ideally pinned to exact versions) so anyone, including future you, can recreate the same environment with <code>pip install -r requirements.txt</code>." },
             { t: "Scripts vs. modules", x: "A <b>script</b> is a file meant to be run directly, top to bottom, with <code>python hello.py</code>. A <b>module</b> is any <code>.py</code> file whose functions and classes you import into other files with <code>import mymodule</code>. The same file can be both — which is why you'll often see <code>if __name__ == \"__main__\":</code> guarding the code that should run only when the file is executed directly, not when it's imported elsewhere." },
+            { t: "Conditionals and loops: if/elif/else, for, while", x: "Branching uses <code>if</code>, an optional chain of <code>elif</code>, and an optional <code>else</code> — each ending in a colon followed by an indented block, with no parentheses required around the condition. A <code>for</code> loop walks through the items of anything iterable, e.g. <code>for day in days:</code>; a <code>while</code> loop repeats as long as its condition stays true. <code>break</code> exits a loop immediately, and <code>continue</code> skips straight to the next iteration. Python has no <code>++</code> or <code>--</code> operators — write <code>count += 1</code> instead." },
             { t: "Indentation, dynamic typing, truthiness, exceptions, and data structures", x: "Python uses <b>indentation</b> (not <code>{ }</code>) to mark code blocks, so consistent spacing isn't just style — it's syntax. Variables are <b>dynamically typed</b>: a name can point to an integer today and a string tomorrow, since the type lives with the value, not the variable. In conditions, Python checks <b>truthiness</b> — empty lists, empty strings, <code>0</code>, and <code>None</code> all count as false, so <code>if not my_list:</code> is a common, idiomatic empty-check. Errors are signaled by <b>raising exceptions</b> rather than returning error codes, and you'll meet the four core structures — <code>list</code>, <code>tuple</code>, <code>dict</code>, <code>set</code> — constantly from here on." }
           ],
           examples: [
             { label: "Your first script", code: `# hello.py
 name = input("What's your name? ")
 print(f"Hello, {name}! Welcome to Python.")` },
+            { label: "if/elif/else, for, and while", code: `temperature = 71
+
+if temperature > 80:
+    print("It's hot")
+elif temperature > 60:
+    print("It's mild")
+else:
+    print("It's cold")
+
+for day in ["Mon", "Tue", "Wed"]:
+    print(f"Studying on {day}")
+
+count = 0
+while count < 3:
+    print(f"Rep {count}")
+    count += 1   # Python has no ++ operator` },
             { label: "Set up a project (terminal commands)", lang: "bash", code: `python -m venv .venv
 source .venv/bin/activate      # Windows: .venv\\Scripts\\activate
 pip install requests
@@ -611,7 +680,27 @@ try:
 except FileNotFoundError:
     print("File not found — that's fine, we'll create it later.")` }
           ],
-          practice: ["Create a small CLI script that reads a file and prints word counts.", "Create and activate a virtual environment.", "Install one dependency and freeze dependencies."],
+          mistakes: [
+            "Forgetting to activate the virtual environment before installing packages or running the script — you'll get a confusing \"module not found\" error, or worse, silently install into your global Python.",
+            "Mixing tabs and spaces for indentation. Pick spaces (4 is the convention) and let your editor enforce it consistently — Python will raise an <code>IndentationError</code> if a block mixes them inconsistently.",
+            "Using <code>==</code> to compare against <code>None</code> instead of <code>is None</code>. <code>is</code> checks identity, which is the correct, idiomatic check for <code>None</code>."
+          ],
+          practice: [
+            { task: "Create a small CLI script that reads a file and prints word counts.", solution: `# wordcount.py
+import sys
+
+def word_count(path: str) -> int:
+    with open(path) as f:
+        return len(f.read().split())
+
+if __name__ == "__main__":
+    path = sys.argv[1]
+    print(f"{path}: {word_count(path)} words")` },
+            { task: "Create and activate a virtual environment.", lang: "bash", solution: `python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\\Scripts\\activate` },
+            { task: "Install one dependency and freeze dependencies.", lang: "bash", solution: `pip install requests
+pip freeze > requirements.txt` }
+          ],
           production: ["Keep dependencies isolated per project.", "Never rely on global Python packages.", "Use .gitignore for virtual environments, cache files, and local data."],
           diagram: flowDiagram(["Python interpreter", "venv (sandbox)", "pip installs packages", "your script runs"], "--p1") },
         { title: "Pythonic Syntax",
@@ -654,7 +743,26 @@ rows = [10, 20, 30, 40, 50]
 print(rows[1:4])    # [20, 30, 40]
 print(rows[::2])    # [10, 30, 50]` }
           ],
-          practice: ["Rewrite a few verbose loops (the kind you'd write in almost any language) into idiomatic Python.", "Parse a CSV-like text file without Pandas."],
+          mistakes: [
+            "Modifying a list while iterating over it (e.g. removing items inside a <code>for</code> loop) — this silently skips elements. Iterate over a copy (<code>for x in list(original):</code>) or build a new list instead.",
+            "Writing a comprehension so dense it's harder to read than the loop it replaced. If it needs a comment to explain itself, a plain loop is usually clearer.",
+            "Confusing <code>sorted(x)</code> (returns a new sorted copy) with <code>x.sort()</code> (mutates <code>x</code> in place and returns <code>None</code> — printing it gives you <code>None</code>, not the sorted list)."
+          ],
+          practice: [
+            { task: "Rewrite a few verbose loops (the kind you'd write in almost any language) into idiomatic Python.", solution: `# before
+squares = []
+for n in range(10):
+    if n % 2 == 0:
+        squares.append(n ** 2)
+
+# after
+squares = [n ** 2 for n in range(10) if n % 2 == 0]` },
+            { task: "Parse a CSV-like text file without Pandas.", solution: `def read_rows(path: str) -> list[dict]:
+    with open(path) as f:
+        header, *lines = f.read().splitlines()
+    columns = header.split(",")
+    return [dict(zip(columns, line.split(","))) for line in lines]` }
+          ],
           production: [] },
         { title: "Functions, Modules, and Errors",
           why: "Functions and clean error handling are what turn a script into something you'd trust in front of a real user — or an interviewer.",
@@ -706,7 +814,22 @@ except InvalidRowError as e:
     lines = f.readlines()
 # the file is automatically closed here, even if an error happened above` }
           ],
-          practice: ["Build reusable utility functions for file parsing.", "Add error handling for missing files and invalid input."],
+          mistakes: [
+            "Forgetting <code>return</code> and assuming <code>print()</code> inside a function sends the value back to the caller — it doesn't; the caller still gets <code>None</code>.",
+            "Using a mutable default argument like <code>def f(items=[]):</code> — one of the most common real-world Python bugs (see Default Parameters above).",
+            "Catching <code>Exception</code> broadly instead of the specific error you expect, which can hide real bugs instead of handling the one you intended."
+          ],
+          practice: [
+            { task: "Build reusable utility functions for file parsing.", solution: `def read_lines(path: str) -> list[str]:
+    with open(path) as f:
+        return [line.strip() for line in f if line.strip()]` },
+            { task: "Add error handling for missing files and invalid input.", solution: `def read_lines(path: str) -> list[str]:
+    try:
+        with open(path) as f:
+            return [line.strip() for line in f if line.strip()]
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Could not find file: {path}")` }
+          ],
           production: [] },
         { title: "Object-Oriented Python",
           why: "It's tempting to reach for classes for everything, especially if your background involved a lot of object-oriented design. Python rewards restraint — this is where you learn when a class actually earns its place.",
@@ -767,7 +890,29 @@ s.score = 105   # raises ValueError` },
 s = Student.from_csv_row("Priya,82")
 print(Student.passing(s.score))   # True` }
           ],
-          practice: ["Model a simple dataset record with dataclass.", "Add validation logic."],
+          mistakes: [
+            "Forgetting <code>self</code> as the first parameter of an instance method — Python won't infer it for you, and you'll get a confusing \"missing argument\" error at the call site instead.",
+            "Reaching for inheritance to share a little behavior between loosely related classes, when composition (or just a shared function) would be simpler and more flexible.",
+            "Adding <code>@dataclass</code> but still hand-writing an <code>__init__</code> that duplicates what it already generates for you."
+          ],
+          practice: [
+            { task: "Model a simple dataset record with dataclass.", solution: `from dataclasses import dataclass
+
+@dataclass
+class Row:
+    name: str
+    score: float` },
+            { task: "Add validation logic.", solution: `from dataclasses import dataclass
+
+@dataclass
+class Row:
+    name: str
+    score: float
+
+    def __post_init__(self):
+        if not 0 <= self.score <= 100:
+            raise ValueError(f"score out of range: {self.score}")` }
+          ],
           production: [] },
         { title: "Type Hints and Tooling",
           why: "Type hints and linters give you a safety net similar to what a compiler checks in statically-typed languages — except here it's opt-in, and checked by a separate tool rather than the language itself.",
@@ -799,7 +944,21 @@ def run(mode: Mode) -> None:
 ruff format .         # auto-format the whole project
 ruff check .          # lint for style and common bugs` }
           ],
-          practice: ["Add type hints to previous scripts.", "Run a formatter and linter."],
+          mistakes: [
+            "Assuming a type hint stops the program if it's violated — it doesn't, unless a separate tool (mypy/pyright) checks it, or you add explicit runtime validation.",
+            "Running the formatter and linter only once at the end of a project instead of continuously — the longer you wait, the bigger and more disruptive the diff becomes."
+          ],
+          practice: [
+            { task: "Add type hints to previous scripts.", solution: `# before
+def word_count(path):
+    ...
+
+# after
+def word_count(path: str) -> int:
+    ...` },
+            { task: "Run a formatter and linter.", lang: "bash", solution: `ruff format .
+ruff check .` }
+          ],
           production: ["Use type hints for public functions and service boundaries.", "Use formatting and linting from day one.", "Keep code style automated."] },
         { title: "Testing Basics",
           why: "Untested code is a rumor. Tests are how you prove your code does what you think it does — and keep proving it after you change something.",
@@ -836,7 +995,25 @@ def test_row_count(sample_rows):
 def test_parse_score(value, expected):
     assert int(value) == expected` }
           ],
-          practice: ["Add tests for the CLI/file parser.", "Test both success and failure cases."],
+          mistakes: [
+            "Writing tests that check implementation details (like an internal variable name) instead of observable behavior — they break every time you refactor, even when nothing is actually broken.",
+            "Only testing the success path and never checking that invalid input raises the error you expect.",
+            "Letting tests depend on execution order or shared mutable state between tests — each test should stand on its own."
+          ],
+          practice: [
+            { task: "Add tests for the CLI/file parser.", solution: `from wordcount import word_count
+
+def test_word_count(tmp_path):
+    file = tmp_path / "sample.txt"
+    file.write_text("hello world foo")
+    assert word_count(str(file)) == 3` },
+            { task: "Test both success and failure cases.", solution: `import pytest
+from wordcount import word_count
+
+def test_word_count_missing_file():
+    with pytest.raises(FileNotFoundError):
+        word_count("does_not_exist.txt")` }
+          ],
           production: ["Tests should cover behavior, not implementation details.", "Keep small pure functions easy to test."] },
         { title: "Mini Project",
           why: "This is where Days 1-6 come together into one small, real program — the first thing in your portfolio that isn't a toy exercise.",
@@ -876,6 +1053,11 @@ def main(path: str) -> None:
 
 if __name__ == "__main__":
     main("students.csv")` }
+          ],
+          mistakes: [
+            "Skipping tests on the \"glue code\" (the <code>main()</code> function) because it feels like just wiring — that's often exactly where bugs hide.",
+            "Silently swallowing bad rows without reporting anything, so a data-quality problem goes unnoticed until much later.",
+            "Hard-coding the input filename inside <code>main()</code> instead of accepting it as an argument — it works for you today, but not for anyone else running the script."
           ],
           practice: ["Deliverable: README.md", "Deliverable: requirements.txt or equivalent dependency file", "Deliverable: source code", "Deliverable: tests"],
           production: [],
@@ -1061,7 +1243,8 @@ if __name__ == "__main__":
         d.topics.map(c => typeof c === "string" ? "<dt>" + c + "</dt>" : "<dt>" + c.t + "</dt><dd>" + c.x + "</dd>").join("") +
         '</dl></section>';
       html += renderExamples(d.examples);
-      if (d.practice.length) html += '<section class="block"><h3>Practice</h3><ul>' + d.practice.map(t => "<li>" + t + "</li>").join("") + '</ul></section>';
+      html += renderMistakes(d.mistakes);
+      html += renderPractice(d.practice);
       if (d.production.length) html += '<section class="block"><h3>Production-Ready Notes</h3><div class="callout"><ul>' + d.production.map(t => "<li>" + t + "</li>").join("") + '</ul></div></section>';
       if (phase.qa && phase.qa.length && current.dayIdx === phase.days.length - 1) {
         html += '<section class="block"><h3>Most Asked / Most Confused Q&amp;A</h3>';
